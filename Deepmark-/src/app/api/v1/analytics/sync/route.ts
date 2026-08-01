@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
           });
 
           syncedCount++;
-        } catch (err) {
+        } catch {
           errors.push(`Failed to sync content ${content.id}`);
         }
       }

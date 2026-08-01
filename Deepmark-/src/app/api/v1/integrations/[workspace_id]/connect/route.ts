@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/jwt';
-import { successResponse, errorResponse, unauthorizedResponse, notFoundResponse, serverErrorResponse } from '@/lib/api-response';
+import { successResponse, errorResponse, unauthorizedResponse, notFoundResponse } from '@/lib/api-response';
 
 const connectSchema = z.object({
   provider: z.enum(['twitter', 'linkedin', 'tiktok']),

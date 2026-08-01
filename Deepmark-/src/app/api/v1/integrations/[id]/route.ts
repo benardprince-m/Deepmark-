@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/jwt';
-import { successResponse, unauthorizedResponse, notFoundResponse, serverErrorResponse } from '@/lib/api-response';
+import { successResponse, unauthorizedResponse, notFoundResponse } from '@/lib/api-response';
 
 interface RouteParams { params: Promise<{ id: string }>; }
 

@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/jwt';
-import { successResponse, createdResponse, errorResponse, unauthorizedResponse, serverErrorResponse } from '@/lib/api-response';
+import { createdResponse, errorResponse, unauthorizedResponse, serverErrorResponse } from '@/lib/api-response';
 
 const createStartupSchema = z.object({
   workspace_id: z.string().uuid('Invalid workspace ID'),

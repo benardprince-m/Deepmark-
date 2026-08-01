@@ -6,7 +6,6 @@ import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 
@@ -23,7 +22,7 @@ export default function DashboardPage() {
     <div>
       <Header
         title="Dashboard"
-        subtitle="Welcome back! Here's your marketing overview"
+        subtitle="Welcome back! Here&apos;s your marketing overview"
         action={
           <Button onClick={() => setIsNewPostOpen(true)}>
             <Plus className="h-4 w-4" />
@@ -58,7 +57,7 @@ export default function DashboardPage() {
       {/* This Week's Plan */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>This Week's Plan</CardTitle>
+          <CardTitle>This Week&apos;s Plan</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
