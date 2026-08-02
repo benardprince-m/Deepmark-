@@ -32,7 +32,7 @@ export default function DashboardPage() {
   if (!isAuth) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-slate-600">Loading...</div>
+        <div className="text-gray-500">Loading...</div>
       </div>
     );
   }
@@ -40,14 +40,14 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-white flex">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-slate-200 bg-slate-50 flex flex-col">
+      <aside className="w-64 border-r border-gray-200 bg-gray-50 flex flex-col">
         {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-slate-200">
+        <div className="h-16 flex items-center px-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <div className="h-8 w-8 rounded-lg bg-violet-600 flex items-center justify-center">
               <span className="text-sm font-bold text-white">D</span>
             </div>
-            <span className="text-base font-semibold text-slate-900">DeepMark</span>
+            <span className="text-base font-bold text-black">DeepMark</span>
           </div>
         </div>
 
@@ -57,7 +57,7 @@ export default function DashboardPage() {
             <a
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-100 transition-colors"
             >
               <svg
                 className="h-5 w-5"
@@ -74,7 +74,7 @@ export default function DashboardPage() {
         </nav>
 
         {/* User */}
-        <div className="p-4 border-t border-slate-200">
+        <div className="p-4 border-t border-gray-200">
           <div className="flex items-center gap-3 mb-3">
             <div className="h-8 w-8 rounded-full bg-violet-600 flex items-center justify-center">
               <span className="text-sm font-medium text-white">
@@ -82,14 +82,14 @@ export default function DashboardPage() {
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-900 truncate">
+              <p className="text-sm font-medium text-black truncate">
                 {user?.email || 'User'}
               </p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-black hover:bg-gray-100 transition-colors"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
@@ -102,23 +102,23 @@ export default function DashboardPage() {
       {/* Main Content */}
       <main className="flex-1">
         {/* Header */}
-        <header className="h-16 border-b border-slate-200 flex items-center justify-between px-8 bg-white">
+        <header className="h-16 border-b border-gray-200 flex items-center justify-between px-8 bg-white">
           <div>
-            <h1 className="text-lg font-semibold text-slate-900">Dashboard</h1>
+            <h1 className="text-lg font-semibold text-black">Dashboard</h1>
           </div>
         </header>
 
         {/* Content */}
         <div className="p-8">
-          <div className="bg-white border border-slate-200 rounded-lg p-8 text-center shadow-sm">
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
             <div className="h-12 w-12 rounded-full bg-violet-100 mx-auto mb-4 flex items-center justify-center">
               <svg className="h-6 w-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-slate-900 mb-2">Welcome to DeepMark</h2>
-            <p className="text-slate-500 max-w-md mx-auto">
-              Your marketing execution dashboard. Start by creating your first campaign or exploring the studio.
+            <h2 className="text-xl font-semibold text-black mb-2">Welcome to DeepMark</h2>
+            <p className="text-gray-500 max-w-md mx-auto">
+              Your marketing execution dashboard. Start by creating your first campaign.
             </p>
           </div>
         </div>

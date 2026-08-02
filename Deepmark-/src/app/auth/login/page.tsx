@@ -59,16 +59,16 @@ export default function LoginPage() {
             <div className="h-10 w-10 rounded-lg bg-violet-600 flex items-center justify-center">
               <span className="text-lg font-bold text-white">D</span>
             </div>
-            <span className="text-xl font-semibold text-slate-900">DeepMark</span>
+            <span className="text-xl font-bold text-black">DeepMark</span>
           </div>
         </div>
 
         {/* Card */}
-        <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
-          <h1 className="text-xl font-semibold text-slate-900 text-center mb-2">
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h1 className="text-xl font-semibold text-black text-center mb-1">
             Welcome back
           </h1>
-          <p className="text-slate-500 text-sm text-center mb-6">
+          <p className="text-sm text-gray-500 text-center mb-6">
             Sign in to your account
           </p>
 
@@ -82,7 +82,7 @@ export default function LoginPage() {
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
                 Email
               </label>
               <input
@@ -92,13 +92,13 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full h-11 px-3 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors"
+                className="w-full h-11 px-4 bg-white border border-gray-200 rounded-lg text-black text-sm placeholder:text-gray-400 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-black mb-2">
                 Password
               </label>
               <input
@@ -109,7 +109,7 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 required
                 minLength={1}
-                className="w-full h-11 px-3 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors"
+                className="w-full h-11 px-4 bg-white border border-gray-200 rounded-lg text-black text-sm placeholder:text-gray-400 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors"
               />
             </div>
 
@@ -124,7 +124,7 @@ export default function LoginPage() {
           </form>
 
           {/* Signup Link */}
-          <p className="text-slate-500 text-sm text-center mt-6">
+          <p className="text-sm text-gray-500 text-center mt-6">
             Don&apos;t have an account?{' '}
             <Link
               href="/auth/signup"
