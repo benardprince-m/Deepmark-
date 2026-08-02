@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback-secret-change-in-production');
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || (() => { throw new Error('JWT_SECRET environment variable is required'); })()
+);
 
 // Public routes that don't require authentication
 const publicRoutes = [

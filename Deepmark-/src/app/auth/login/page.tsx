@@ -51,7 +51,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-[400px]">
         {/* Logo */}
         <div className="flex justify-center mb-8">
@@ -59,30 +59,30 @@ export default function LoginPage() {
             <div className="h-10 w-10 rounded-lg bg-violet-600 flex items-center justify-center">
               <span className="text-lg font-bold text-white">D</span>
             </div>
-            <span className="text-xl font-semibold text-white">DeepMark</span>
+            <span className="text-xl font-semibold text-slate-900">DeepMark</span>
           </div>
         </div>
 
         {/* Card */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-          <h1 className="text-xl font-semibold text-white text-center mb-2">
+        <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
+          <h1 className="text-xl font-semibold text-slate-900 text-center mb-2">
             Welcome back
           </h1>
-          <p className="text-zinc-400 text-sm text-center mb-6">
+          <p className="text-slate-500 text-sm text-center mb-6">
             Sign in to your account
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Error Message */}
             {error && (
-              <div className="bg-red-500/10 border border-red-500/50 rounded-lg px-4 py-3 text-sm text-red-400">
+              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-600">
                 {error}
               </div>
             )}
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
                 Email
               </label>
               <input
@@ -92,13 +92,13 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full h-11 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors"
+                className="w-full h-11 px-3 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
                 Password
               </label>
               <input
@@ -109,7 +109,7 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 required
                 minLength={1}
-                className="w-full h-11 px-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors"
+                className="w-full h-11 px-3 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors"
               />
             </div>
 
@@ -124,11 +124,11 @@ export default function LoginPage() {
           </form>
 
           {/* Signup Link */}
-          <p className="text-zinc-400 text-sm text-center mt-6">
+          <p className="text-slate-500 text-sm text-center mt-6">
             Don&apos;t have an account?{' '}
             <Link
               href="/auth/signup"
-              className="text-violet-400 hover:text-violet-300 font-medium transition-colors"
+              className="text-violet-600 hover:text-violet-700 font-medium transition-colors"
             >
               Sign up
             </Link>

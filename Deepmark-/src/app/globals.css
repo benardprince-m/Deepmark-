@@ -2,16 +2,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* DeepMark Design System Colors */
-  --background: #000000;
-  --foreground: #FFFFFF;
-  --muted: #6B7280;
+  /* DeepMark Design System Colors - Light Mode */
+  --background: #FFFFFF;
+  --foreground: #0F172A;
+  --muted: #64748B;
   --accent: #7C3AED;
   --success: #10B981;
   --error: #EF4444;
-  --card: #111827;
-  --border: #374151;
-  --placeholder: #9CA3AF;
+  --card: #F8FAFC;
+  --border: #E2E8F0;
+  --placeholder: #94A3B8;
 }
 
 @theme inline {
