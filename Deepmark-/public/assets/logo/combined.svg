@@ -1,0 +1,16 @@
+<svg width="400" height="120" viewBox="0 0 400 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="120" fill="#191919"/>
+  
+  <!-- Icon -->
+  <g transform="translate(40, 30)">
+    <path d="M8 0 L24 0 L20 60 L4 60 Z" fill="#FFFFFF"/>
+    <path d="M28 8 L44 8 L40 60 L24 60 Z" fill="#FFFFFF"/>
+  </g>
+  
+  <!-- Wordmark -->
+  <text x="90" y="52" font-family="Inter, sans-serif" font-size="28" font-weight="800" letter-spacing="-0.04em" fill="#FFFFFF">DeepMark</text>
+  
+  <!-- Tagline -->
+  <text x="92" y="75" font-family="Inter, sans-serif" font-size="10" font-weight="500" letter-spacing="0.25em" fill="#666666">MARKETING THAT WORKS. WHILE YOU DO.</text>
+</svg>

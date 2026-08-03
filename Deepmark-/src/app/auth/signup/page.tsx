@@ -18,13 +18,11 @@ export default function SignupPage() {
     setError('');
     setSuccess(false);
 
-    // Validate password confirmation
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
-    // Validate password length
     if (password.length < 8) {
       setError('Password must be at least 8 characters');
       return;
@@ -46,7 +44,6 @@ export default function SignupPage() {
         return;
       }
 
-      // Show success message and redirect to login
       setSuccess(true);
       setTimeout(() => {
         router.push('/auth/login');
@@ -59,45 +56,43 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F6F6F6] flex items-center justify-center p-4">
       <div className="w-full max-w-[400px]">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-violet-600 flex items-center justify-center">
-              <span className="text-lg font-bold text-white">D</span>
-            </div>
-            <span className="text-xl font-bold text-black">DeepMark</span>
-          </div>
+          <Link href="/" className="flex items-center gap-3">
+            <img src="/assets/logo/icon.svg" alt="DeepMark" className="h-10 w-10" />
+            <span className="text-xl font-extrabold tracking-tight text-[#191919]">DeepMark</span>
+          </Link>
         </div>
 
         {/* Card */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h1 className="text-xl font-semibold text-black text-center mb-1">
+        <div className="bg-white border border-[#E8E8E8] rounded-[10px] p-6">
+          <h1 className="text-xl font-semibold text-[#191919] text-center mb-1">
             Create your account
           </h1>
-          <p className="text-sm text-gray-500 text-center mb-6">
+          <p className="text-sm text-[#858585] text-center mb-6">
             Start your marketing journey
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Success Message */}
             {success && (
-              <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-600">
+              <div className="bg-[#28C76F]/10 border border-[#28C76F]/20 rounded-[10px] px-4 py-3 text-sm text-[#28C76F]">
                 Account created. Redirecting to login...
               </div>
             )}
 
             {/* Error Message */}
             {error && !success && (
-              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-600">
+              <div className="bg-red-50 border border-red-200 rounded-[10px] px-4 py-3 text-sm text-red-600">
                 {error}
               </div>
             )}
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-[#191919] mb-2">
                 Email
               </label>
               <input
@@ -108,13 +103,13 @@ export default function SignupPage() {
                 placeholder="you@example.com"
                 required
                 disabled={success}
-                className="w-full h-11 px-4 bg-white border border-gray-200 rounded-lg text-black text-sm placeholder:text-gray-400 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors disabled:opacity-50"
+                className="w-full h-11 px-4 bg-white border border-[#E8E8E8] rounded-[10px] text-[#191919] text-sm placeholder:text-[#858585] focus:outline-none focus:border-[#191919] focus:ring-[3px] focus:ring-[rgba(25,25,25,0.08)] transition-all disabled:opacity-50"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-black mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-[#191919] mb-2">
                 Password
               </label>
               <input
@@ -126,13 +121,13 @@ export default function SignupPage() {
                 required
                 minLength={8}
                 disabled={success}
-                className="w-full h-11 px-4 bg-white border border-gray-200 rounded-lg text-black text-sm placeholder:text-gray-400 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors disabled:opacity-50"
+                className="w-full h-11 px-4 bg-white border border-[#E8E8E8] rounded-[10px] text-[#191919] text-sm placeholder:text-[#858585] focus:outline-none focus:border-[#191919] focus:ring-[3px] focus:ring-[rgba(25,25,25,0.08)] transition-all disabled:opacity-50"
               />
             </div>
 
             {/* Confirm Password */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-black mb-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#191919] mb-2">
                 Confirm Password
               </label>
               <input
@@ -144,7 +139,7 @@ export default function SignupPage() {
                 required
                 minLength={8}
                 disabled={success}
-                className="w-full h-11 px-4 bg-white border border-gray-200 rounded-lg text-black text-sm placeholder:text-gray-400 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors disabled:opacity-50"
+                className="w-full h-11 px-4 bg-white border border-[#E8E8E8] rounded-[10px] text-[#191919] text-sm placeholder:text-[#858585] focus:outline-none focus:border-[#191919] focus:ring-[3px] focus:ring-[rgba(25,25,25,0.08)] transition-all disabled:opacity-50"
               />
             </div>
 
@@ -152,18 +147,18 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading || success}
-              className="w-full h-11 bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              className="w-full h-11 bg-[#191919] hover:bg-[#525252] text-white font-medium rounded-[10px] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
             >
               {loading ? 'Creating account...' : success ? 'Redirecting...' : 'Create account'}
             </button>
           </form>
 
           {/* Login Link */}
-          <p className="text-sm text-gray-500 text-center mt-6">
+          <p className="text-sm text-[#858585] text-center mt-6">
             Already have an account?{' '}
             <Link
               href="/auth/login"
-              className="text-violet-600 hover:text-violet-700 font-medium transition-colors"
+              className="text-[#191919] font-medium hover:underline"
             >
               Sign in
             </Link>
