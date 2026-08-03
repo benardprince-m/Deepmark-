@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
+import { rateLimit } from '@/lib/rate-limit';
 import { supabaseAdmin } from '@/lib/supabase';
 import { signToken } from '@/lib/jwt';
 import { createdResponse, errorResponse, serverErrorResponse } from '@/lib/api-response';
@@ -12,9 +13,21 @@ const signupSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // Rate limiting: 5 attempts per minute per IP
+  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+  const limited = rateLimit(`signup:${ip}`, { windowMs: 60000, maxRequests: 5 });
+  
+  if (!limited.allowed) {
+    return errorResponse(
+      'Too many signup attempts. Please try again later.',
+      'rate_limited',
+      429
+    );
+  }
+
   try {
     const body = await request.json();
-    
+
     const validation = signupSchema.safeParse(body);
     if (!validation.success) {
       return errorResponse(validation.error.errors[0].message, 'validation_error');
