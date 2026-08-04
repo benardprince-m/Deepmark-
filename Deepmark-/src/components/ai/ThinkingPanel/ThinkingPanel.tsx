@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, createContext, useContext, ReactNode, useRef } from 'react';
-import { ThinkingStage, ThinkingStep, ThinkingState, THINKING_STAGES } from './types';
+import { ThinkingStage, ThinkingState, THINKING_STAGES } from './types';
 
 // Context for sharing thinking state
 interface ThinkingContextValue {
@@ -157,11 +157,13 @@ export function ThinkingIndicator({ state }: { state: ThinkingState }) {
       return () => clearInterval(interval);
     } else if (state.endTime && state.startTime) {
       const finalElapsed = Math.round((state.endTime - state.startTime) / 1000);
-      if (elapsed !== finalElapsed) {
+      // Use requestAnimationFrame to avoid synchronous setState
+      const frameId = requestAnimationFrame(() => {
         setElapsed(finalElapsed);
-      }
+      });
+      return () => cancelAnimationFrame(frameId);
     }
-  }, [state.startTime, state.endTime, state.isActive, elapsed]);
+  }, [state.startTime, state.endTime, state.isActive]);
 
   if (state.currentStage === 'idle') {
     return null;

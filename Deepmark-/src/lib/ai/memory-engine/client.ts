@@ -110,7 +110,7 @@ export async function retrieveMemory(query: MemoryQuery, context: string = ''): 
       .filter(card => card.score > 30) // Minimum relevance threshold
       .sort((a, b) => b.score - a.score);
     
-    return scored.map(({ score: _score, ...card }) => ({
+    return scored.map(({ score: _unused, ...card }) => ({
       id: card.id,
       workspaceId: card.workspace_id,
       category: card.category as MemoryCard['category'],

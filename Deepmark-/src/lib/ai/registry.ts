@@ -176,7 +176,7 @@ export async function requestCapability(
   request: CapabilityRequest
 ): Promise<CapabilityResponse> {
   const thinkingStages: { stage: ThinkingStage; timestamp: number }[] = [];
-  const think = request.options?.thinkingCallback || ((stage: ThinkingStage, _details?: string) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+  const think = request.options?.thinkingCallback || ((stage: ThinkingStage, _details?: string) => {
     thinkingStages.push({ stage, timestamp: Date.now() });
   });
   

@@ -48,7 +48,6 @@ export abstract class BaseAdapter implements AIProvider {
     throw lastError || new Error("AI Provider failed after all retries");
   }
   
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async *stream(_request: AIRequest): AsyncIterable<string> {
     // Streaming not yet implemented - use generate() instead
     throw new Error("Streaming not implemented");
