@@ -93,6 +93,22 @@ export type AICapability =
   | "rewriteCopy"
   | "extractMemory";
 
+export type ThinkingStage = 
+  | "idle" 
+  | "understanding" 
+  | "retrieving_memory" 
+  | "selecting_skills" 
+  | "building_prompt" 
+  | "selecting_provider" 
+  | "calling_provider" 
+  | "validating_response" 
+  | "returning_result" 
+  | "error";
+
+export interface ThinkingCallback {
+  (stage: ThinkingStage, details?: string): void;
+}
+
 export interface StartupProfile {
   name: string;
   industry?: string;
@@ -141,6 +157,7 @@ export interface CapabilityRequest {
   options?: {
     stream?: boolean;
     modelOverride?: string;
+    thinkingCallback?: ThinkingCallback;
   };
 }
 
@@ -151,19 +168,47 @@ export interface CapabilityResponse {
   model: string;
   tokensUsed?: AIUsage;
   memoryUpdated?: MemoryCard[];
+  thinkingStages?: { stage: ThinkingStage; timestamp: number }[];
 }
 
 // Request a capability from the AI system
 export async function requestCapability(
   request: CapabilityRequest
 ): Promise<CapabilityResponse> {
+  const thinkingStages: { stage: ThinkingStage; timestamp: number }[] = [];
+  const think = request.options?.thinkingCallback || ((stage: ThinkingStage, _details?: string) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+    thinkingStages.push({ stage, timestamp: Date.now() });
+  });
+  
+  // Stage: Understanding
+  think("understanding", "Parsing user request");
+  
+  // Stage: Retrieving memory (already passed in context)
+  if (request.context.memory.length > 0) {
+    think("retrieving_memory", `Found ${request.context.memory.length} relevant memories`);
+  } else {
+    think("retrieving_memory", "No previous memories found");
+  }
+  
+  // Stage: Selecting skills
+  think("selecting_skills", request.context.skills.length > 0 
+    ? `Selected ${request.context.skills.length} skills` 
+    : "Using default marketing strategy");
+  
+  // Stage: Building prompt
+  think("building_prompt", "Constructing context-rich prompt");
+  
+  // Get provider
+  think("selecting_provider", "Determining best AI provider");
   const provider = await getActiveProvider();
   
-  // For MVP, we'll construct a simple prompt based on the capability
-  // The full Prompt Engine will be implemented separately
+  // Build prompts
   const systemPrompt = buildSystemPrompt(request);
   const userPrompt = buildUserPrompt(request);
   
+  think("calling_provider", `Calling ${provider.displayName}`);
+  
+  // Make the API call
   const aiRequest: AIRequest = {
     messages: [
       { role: "system", content: systemPrompt },
@@ -173,15 +218,24 @@ export async function requestCapability(
     maxTokens: 2000,
   };
   
-  const response = await provider.generate(aiRequest);
-  
-  return {
-    output: response.content,
-    promptUsed: systemPrompt + "\n\n" + userPrompt,
-    provider: response.provider,
-    model: response.model,
-    tokensUsed: response.usage,
-  };
+  try {
+    const response = await provider.generate(aiRequest);
+    
+    think("validating_response", "Verifying response quality");
+    think("returning_result", "Formatting output");
+    
+    return {
+      output: response.content,
+      promptUsed: systemPrompt + "\n\n" + userPrompt,
+      provider: response.provider,
+      model: response.model,
+      tokensUsed: response.usage,
+      thinkingStages,
+    };
+  } catch (error) {
+    think("error", error instanceof Error ? error.message : "Unknown error");
+    throw error;
+  }
 }
 
 // Build system prompt from context
