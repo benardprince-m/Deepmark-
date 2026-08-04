@@ -5,7 +5,8 @@ import { ProviderAdapter } from "../interface";
 import { AIRequest, AIResponse, AIProviderValidation } from "../types";
 
 const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
-const DEFAULT_MODEL = "meta-llama/llama-3.1-8b-instruct:free";
+// Using google/gemma-4-26b-a4b-it:free - verified working 2026-08-04
+const DEFAULT_MODEL = "google/gemma-4-26b-a4b-it:free";
 
 class OpenRouterAdapter implements ProviderAdapter {
   readonly providerName = "openrouter";

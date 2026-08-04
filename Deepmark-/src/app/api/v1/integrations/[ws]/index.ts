@@ -4,7 +4,7 @@ import { getUserFromRequest } from '@/lib/jwt';
 import { successResponse, unauthorizedResponse, notFoundResponse, serverErrorResponse } from '@/lib/api-response';
 
 interface RouteParams {
-  params: Promise<{ workspace_id: string }>;
+  params: Promise<{ ws: string }>;
 }
 
 async function verifyWorkspaceAccess(workspaceId: string, userId: string) {
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return unauthorizedResponse();
   }
 
-  const { workspace_id } = await params;
+  const { ws: workspace_id } = await params;
 
   try {
     const hasAccess = await verifyWorkspaceAccess(workspace_id, userPayload.userId);

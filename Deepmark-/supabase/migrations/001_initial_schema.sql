@@ -1,12 +1,12 @@
 -- DeepMark Database Schema
 -- Version: 1.0.0
 
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- Enable UUID extension (Supabase manages this)
+-- Using gen_random_uuid() instead of gen_random_uuid() for compatibility
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -18,7 +18,7 @@ CREATE INDEX idx_users_email ON users(email) WHERE deleted_at IS NULL;
 
 -- Workspaces table
 CREATE TABLE IF NOT EXISTS workspaces (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -30,7 +30,7 @@ CREATE INDEX idx_workspaces_user_id ON workspaces(user_id) WHERE deleted_at IS N
 
 -- Startups table
 CREATE TABLE IF NOT EXISTS startups (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     website VARCHAR(500),
@@ -47,7 +47,7 @@ CREATE INDEX idx_startups_workspace_id ON startups(workspace_id) WHERE deleted_a
 
 -- Integrations table
 CREATE TABLE IF NOT EXISTS integrations (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
     provider VARCHAR(50) CHECK (provider IN ('twitter', 'linkedin', 'tiktok')),
     access_token TEXT NOT NULL,
@@ -64,7 +64,7 @@ CREATE INDEX idx_integrations_workspace_provider ON integrations(workspace_id, p
 
 -- Campaigns table
 CREATE TABLE IF NOT EXISTS campaigns (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     startup_id UUID REFERENCES startups(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     theme VARCHAR(255),
@@ -81,7 +81,7 @@ CREATE INDEX idx_campaigns_startup_id ON campaigns(startup_id) WHERE deleted_at 
 
 -- Content table
 CREATE TABLE IF NOT EXISTS content (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     campaign_id UUID REFERENCES campaigns(id) ON DELETE CASCADE,
     type VARCHAR(50) CHECK (type IN ('post', 'carousel', 'image_prompt', 'video_prompt')),
     title VARCHAR(255) NOT NULL,
@@ -100,7 +100,7 @@ CREATE INDEX idx_content_campaign_status ON content(campaign_id, status) WHERE d
 
 -- Tasks table
 CREATE TABLE IF NOT EXISTS tasks (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     campaign_id UUID REFERENCES campaigns(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -117,7 +117,7 @@ CREATE INDEX idx_tasks_due_date ON tasks(due_date);
 
 -- Analytics table
 CREATE TABLE IF NOT EXISTS analytics (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     content_id UUID REFERENCES content(id) ON DELETE CASCADE,
     platform VARCHAR(50),
     impressions INTEGER DEFAULT 0,
@@ -131,7 +131,7 @@ CREATE INDEX idx_analytics_content_recorded ON analytics(content_id, recorded_at
 
 -- Memory table
 CREATE TABLE IF NOT EXISTS memory (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
     category VARCHAR(50) CHECK (category IN ('voice', 'positioning', 'preferences', 'results')),
     title VARCHAR(255) NOT NULL,
