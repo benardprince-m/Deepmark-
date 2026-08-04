@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { supabaseAdmin } from '@/lib/supabase';
 import { signToken } from '@/lib/jwt';
 import { createdResponse, errorResponse, serverErrorResponse } from '@/lib/api-response';
+import { rateLimit, rateLimitConfigs, getClientIP, createAuthRateLimitKey } from '@/lib/rate-limit';
 
 const signupSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -12,6 +13,31 @@ const signupSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // Apply rate limiting
+  const ip = getClientIP(request);
+  const rateLimitKey = createAuthRateLimitKey(ip, 'signup');
+  const rateLimitResult = rateLimit(rateLimitKey, rateLimitConfigs.authSignup);
+
+  if (!rateLimitResult.allowed) {
+    const retryAfter = Math.ceil((rateLimitResult.resetAt - Date.now()) / 1000);
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'rate_limit_exceeded',
+        message: 'Too many signup attempts. Please try again later.'
+      }),
+      {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': retryAfter.toString(),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': rateLimitResult.resetAt.toString()
+        }
+      }
+    );
+  }
+
   try {
     const body = await request.json();
     

@@ -44,7 +44,7 @@ export default function DashboardPage() {
         {/* Logo */}
         <div className="h-16 flex items-center px-6 border-b border-slate-200">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-violet-600 flex items-center justify-center">
+            <div className="h-8 w-8 rounded-lg bg-black flex items-center justify-center">
               <span className="text-sm font-bold text-white">D</span>
             </div>
             <span className="text-base font-semibold text-slate-900">DeepMark</span>
@@ -76,7 +76,7 @@ export default function DashboardPage() {
         {/* User */}
         <div className="p-4 border-t border-slate-200">
           <div className="flex items-center gap-3 mb-3">
-            <div className="h-8 w-8 rounded-full bg-violet-600 flex items-center justify-center">
+            <div className="h-8 w-8 rounded-full bg-black flex items-center justify-center">
               <span className="text-sm font-medium text-white">
                 {user?.email?.[0]?.toUpperCase() || 'U'}
               </span>
@@ -111,8 +111,8 @@ export default function DashboardPage() {
         {/* Content */}
         <div className="p-8">
           <div className="bg-white border border-slate-200 rounded-lg p-8 text-center shadow-sm">
-            <div className="h-12 w-12 rounded-full bg-violet-100 mx-auto mb-4 flex items-center justify-center">
-              <svg className="h-6 w-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+            <div className="h-12 w-12 rounded-full bg-zinc-100 mx-auto mb-4 flex items-center justify-center">
+              <svg className="h-6 w-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>

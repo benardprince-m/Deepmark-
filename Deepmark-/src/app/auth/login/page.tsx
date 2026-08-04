@@ -56,7 +56,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-violet-600 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-lg bg-black flex items-center justify-center">
               <span className="text-lg font-bold text-white">D</span>
             </div>
             <span className="text-xl font-semibold text-slate-900">DeepMark</span>
@@ -92,7 +92,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full h-11 px-3 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors"
+                className="w-full h-11 px-3 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors"
               />
             </div>
 
@@ -109,7 +109,7 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 required
                 minLength={1}
-                className="w-full h-11 px-3 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 transition-colors"
+                className="w-full h-11 px-3 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors"
               />
             </div>
 
@@ -117,7 +117,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-11 bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              className="w-full h-11 bg-black hover:bg-gray-800 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
@@ -128,7 +128,7 @@ export default function LoginPage() {
             Don&apos;t have an account?{' '}
             <Link
               href="/auth/signup"
-              className="text-violet-600 hover:text-violet-700 font-medium transition-colors"
+              className="text-black hover:text-gray-700 font-medium transition-colors"
             >
               Sign up
             </Link>

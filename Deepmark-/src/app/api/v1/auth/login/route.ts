@@ -3,7 +3,8 @@ import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { supabaseAdmin } from '@/lib/supabase';
 import { signToken } from '@/lib/jwt';
-import { successResponse, errorResponse, serverErrorResponse } from '@/lib/api-response';
+import { errorResponse, serverErrorResponse } from '@/lib/api-response';
+import { rateLimit, rateLimitConfigs, getClientIP, createAuthRateLimitKey } from '@/lib/rate-limit';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -11,6 +12,31 @@ const loginSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // Apply rate limiting
+  const ip = getClientIP(request);
+  const rateLimitKey = createAuthRateLimitKey(ip, 'login');
+  const rateLimitResult = rateLimit(rateLimitKey, rateLimitConfigs.auth);
+
+  if (!rateLimitResult.allowed) {
+    const retryAfter = Math.ceil((rateLimitResult.resetAt - Date.now()) / 1000);
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'rate_limit_exceeded',
+        message: 'Too many login attempts. Please try again later.'
+      }),
+      {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': retryAfter.toString(),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': rateLimitResult.resetAt.toString()
+        }
+      }
+    );
+  }
+
   try {
     const body = await request.json();
     
@@ -42,10 +68,23 @@ export async function POST(request: NextRequest) {
     // Generate JWT
     const token = await signToken({ userId: user.id, email: user.email });
 
-    return successResponse({
-      user: { id: user.id, email: user.email },
-      token
-    }, 'Login successful');
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: {
+          user: { id: user.id, email: user.email },
+          token
+        },
+        message: 'Login successful'
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-RateLimit-Remaining': rateLimitResult.remaining.toString()
+        }
+      }
+    );
   } catch (error) {
     console.error('Login error:', error);
     return serverErrorResponse();

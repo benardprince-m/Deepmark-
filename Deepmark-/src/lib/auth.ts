@@ -78,3 +78,66 @@ export function isTokenExpired(): boolean {
   
   return false;
 }
+
+export function isTokenExpiringSoon(thresholdMs: number = 5 * 60 * 1000): boolean {
+  const token = getToken();
+  if (!token) return true;
+  
+  try {
+    const payload = token.split('.')[1];
+    const decoded = JSON.parse(atob(payload));
+    
+    if (decoded.exp) {
+      return decoded.exp * 1000 < Date.now() + thresholdMs;
+    }
+  } catch {
+    return true;
+  }
+  
+  return false;
+}
+
+export async function refreshToken(): Promise<boolean> {
+  const token = getToken();
+  if (!token) return false;
+  
+  try {
+    const response = await fetch('/api/v1/auth/refresh', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    
+    if (!response.ok) {
+      return false;
+    }
+    
+    const data = await response.json();
+    if (data.success && data.data?.token) {
+      saveToken(data.data.token);
+      return true;
+    }
+    
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+export async function getValidToken(): Promise<string | null> {
+  const token = getToken();
+  if (!token) return null;
+  
+  // If token is expired, try to refresh
+  if (isTokenExpired()) {
+    const refreshed = await refreshToken();
+    if (refreshed) {
+      return getToken();
+    }
+    // If refresh failed, clear auth
+    logout();
+    return null;
+  }
+  
+  return token;
+}
