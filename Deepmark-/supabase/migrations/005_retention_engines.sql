@@ -1,46 +1,65 @@
--- Migration 005: Retention Engines - Global Trends & Content Velocity
--- Creates tables for marketing globe and conversion tracking
+-- Migration 005: Retention Engines - Complete Schema & Seed Data
+-- Global Trend Nodes & Content Velocity Tracking
 
--- 1. Global Trend Nodes (For the Globe / Discovery Engine)
+-- 1. Create global_trend_nodes table
 CREATE TABLE IF NOT EXISTS public.global_trend_nodes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     region_name TEXT NOT NULL,
-    coordinates JSONB NOT NULL,
+    city_name TEXT NOT NULL,
+    latitude DOUBLE PRECISION NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
     niche TEXT NOT NULL,
-    strategy_data JSONB NOT NULL,
+    hook_structures JSONB NOT NULL DEFAULT '[]'::jsonb,
+    competitor_angles JSONB NOT NULL DEFAULT '[]'::jsonb,
+    consumer_psychology TEXT NOT NULL,
+    conversion_velocity_score INTEGER DEFAULT 85,
     status_color TEXT NOT NULL DEFAULT '#22C55E',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 ALTER TABLE public.global_trend_nodes ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read access to global trends" ON public.global_trend_nodes FOR SELECT USING (true);
-CREATE POLICY "System can insert global trends" ON public.global_trend_nodes FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public read access to global trends" 
+ON public.global_trend_nodes FOR SELECT USING (true);
 
--- 2. Content Velocity Tracking (For the Heatmap / Attribution Engine)
+-- 2. Create content_velocity_tracking table
 CREATE TABLE IF NOT EXISTS public.content_velocity_tracking (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
     content_id UUID NOT NULL REFERENCES public.content(id) ON DELETE CASCADE,
     source_trend_id UUID REFERENCES public.global_trend_nodes(id) ON DELETE SET NULL,
-    clicks INTEGER DEFAULT 0 NOT NULL,
+    link_clicks INTEGER DEFAULT 0 NOT NULL,
     signups INTEGER DEFAULT 0 NOT NULL,
     conversion_rate DECIMAL(5,2) DEFAULT 0.00 NOT NULL,
-    verified_variant BOOLEAN DEFAULT false NOT NULL,
+    is_verified_variant BOOLEAN DEFAULT false NOT NULL,
+    hourly_signals JSONB NOT NULL DEFAULT '[]'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 ALTER TABLE public.content_velocity_tracking ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can manage velocity tracking for their workspace" ON public.content_velocity_tracking 
-    FOR ALL USING (workspace_id IN (SELECT id FROM public.workspaces WHERE user_id = auth.uid()));
+CREATE POLICY "Users can manage velocity tracking for their workspace" 
+ON public.content_velocity_tracking FOR ALL 
+USING (workspace_id IN (SELECT id FROM public.workspaces WHERE user_id = auth.uid()));
 
--- 3. Seed some initial global trend data
-INSERT INTO public.global_trend_nodes (region_name, coordinates, niche, strategy_data, status_color) VALUES
-    ('United States', '{"lat": 37.0902, "lng": -95.7129}', 'SaaS', '{"hook": "10x Productivity", "angle": "Time is money, save both"}', '#22C55E'),
-    ('United Kingdom', '{"lat": 55.3781, "lng": -3.4360}', 'Fintech', '{"hook": "Stop Overspending", "angle": "Bank smarter not harder"}', '#22C55E'),
-    ('Nigeria', '{"lat": 9.0820, "lng": 8.6753}', 'Payments', '{"hook": "Send Money Free", "angle": "No fees, ever"}', '#22C55E'),
-    ('India', '{"lat": 20.5937, "lng": 78.9629}', 'EdTech', '{"hook": "Learn in 30 Days", "angle": "Or your money back"}', '#22C55E'),
-    ('Brazil', '{"lat": -14.2350, "lng": -51.9253}', 'E-commerce', '{"hook": "Shop Global Prices", "angle": "Import without the tax"}', '#22C55E'),
-    ('Germany', '{"lat": 51.1657, "lng": 10.4515}', 'B2B', '{"hook": "Enterprise at Startup Prices", "angle": "Scale without CFO approval"}', '#EF4444'),
-    ('Japan', '{"lat": 36.2048, "lng": 138.2529}', 'AI', '{"hook": "Work 50% Less", "angle": "AI does the rest"}', '#22C55E'),
-    ('Singapore', '{"lat": 1.3521, "lng": 103.8198}', 'Crypto', '{"hook": " DCA Made Simple", "angle": "Set it and forget it"}', '#22C55E')
-ON CONFLICT DO NOTHING;
+-- 3. Seed Regional Intelligence Nodes
+INSERT INTO public.global_trend_nodes (region_name, city_name, latitude, longitude, niche, hook_structures, competitor_angles, consumer_psychology, conversion_velocity_score, status_color)
+VALUES 
+('East Africa', 'Nairobi', -1.2921, 36.8219, 'Fintech / SaaS', 
+ '["Why 80% of merchants bypass standard POS for mobile rails", "The hidden cost of manual reconciliation in emerging hubs"]'::jsonb,
+ '["Direct-to-WhatsApp automation", "Frictionless peer-to-business settlements"]'::jsonb,
+ 'High trust friction; requires social proof and instant mobile-first responsiveness.', 94, '#22C55E'),
+
+('Western Europe', 'London', 51.5074, -0.1278, 'B2B Tech', 
+ '["We stopped tracking vanity metrics and our pipeline tripled", "The death of bloated SaaS subscriptions"]'::jsonb,
+ '["Aggressive cost consolidation", "Anti-seat-licensing pricing models"]'::jsonb,
+ 'High skepticism toward AI wrappers; demands verifiable ROI and strict compliance.', 88, '#22C55E'),
+
+('North America', 'San Francisco', 37.7749, -122.4194, 'AI / Developer Tools', 
+ '["Stop building wrappers: The orchestration layer is where the moat lives", "Why your autonomous agent fails in production"]'::jsonb,
+ '["Local-first LLM orchestration", "Agent-to-agent MCP infrastructure"]'::jsonb,
+ 'Obsessed with technical depth and leverage; allergic to generic marketing copy.', 96, '#22C55E'),
+
+('East Asia', 'Tokyo', 35.6762, 139.6503, 'E-Commerce / Consumer', 
+ '["Micro-communities are outperforming traditional ad spend by 4x", "The shift to frictionless asynchronous checkout"]'::jsonb,
+ '["Hyper-curated localized loyalty loops", "Zero-noise minimalism"]'::jsonb,
+ 'Values brand craftsmanship, precision, and zero unsolicited marketing friction.', 72, '#EF4444');
