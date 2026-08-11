@@ -1,6 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+
+// Dynamically import Globe to avoid SSR issues and reduce initial bundle
+const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
 
 interface TrendNode {
   id: string;
@@ -11,88 +15,26 @@ interface TrendNode {
   status_color: string;
 }
 
-interface IntelligenceCardProps {
-  node: TrendNode;
-  onClose: () => void;
-  onPushToStudio: () => void;
-}
-
-function IntelligenceCard({ node, onClose, onPushToStudio }: IntelligenceCardProps) {
-  return (
-    <div style={{
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      background: '#FFFFFF',
-      borderRadius: 14,
-      padding: 24,
-      width: 320,
-      maxWidth: '90vw',
-      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-      zIndex: 1000,
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
-        <div>
-          <h3 style={{ fontSize: 18, fontWeight: 700, color: '#191919', marginBottom: 4 }}>{node.region_name}</h3>
-          <span style={{
-            fontSize: 11,
-            fontWeight: 600,
-            padding: '4px 8px',
-            borderRadius: 6,
-            background: node.status_color === '#22C55E' ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)',
-            color: node.status_color,
-          }}>
-            {node.niche}
-          </span>
-        </div>
-        <button onClick={onClose} style={{
-          background: 'transparent',
-          border: 'none',
-          fontSize: 24,
-          cursor: 'pointer',
-          color: '#858585',
-        }}>×</button>
-      </div>
-      
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: '#858585', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
-          Top Hook
-        </div>
-        <p style={{ fontSize: 15, fontWeight: 600, color: '#191919', marginBottom: 12 }}>"{node.strategy_data.hook}"</p>
-        
-        <div style={{ fontSize: 12, fontWeight: 700, color: '#858585', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
-          Competitor Angle
-        </div>
-        <p style={{ fontSize: 14, color: '#525252' }}>{node.strategy_data.angle}</p>
-      </div>
-
-      <button
-        onClick={onPushToStudio}
-        style={{
-          width: '100%',
-          padding: '12px 20px',
-          background: '#191919',
-          color: '#FFFFFF',
-          border: 'none',
-          borderRadius: 8,
-          fontSize: 14,
-          fontWeight: 600,
-          cursor: 'pointer',
-        }}
-      >
-        Push to Studio →
-      </button>
-    </div>
-  );
+interface NodeData {
+  id: string;
+  lat: number;
+  lng: number;
+  region_name: string;
+  niche: string;
+  hook: string;
+  angle: string;
+  color: string;
+  size: number;
 }
 
 export default function MarketingGlobe() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [nodes, setNodes] = useState<TrendNode[]>([]);
-  const [selectedNode, setSelectedNode] = useState<TrendNode | null>(null);
+  const globeRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [nodes, setNodes] = useState<NodeData[]>([]);
+  const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [arbitragePlay, setArbitragePlay] = useState<TrendNode | null>(null);
+  const [arbitragePlay, setArbitragePlay] = useState<NodeData | null>(null);
+  const [dimensions, setDimensions] = useState({ width: 400, height: 400 });
 
   // Fetch global trends
   useEffect(() => {
@@ -100,13 +42,23 @@ export default function MarketingGlobe() {
       try {
         const response = await fetch('/api/v1/trends/global');
         const data = await response.json();
-        if (data.success) {
-          setNodes(data.data);
+        if (data.success && data.data.length > 0) {
+          const mappedNodes: NodeData[] = data.data.map((node: TrendNode) => ({
+            id: node.id,
+            lat: node.coordinates.lat,
+            lng: node.coordinates.lng,
+            region_name: node.region_name,
+            niche: node.niche,
+            hook: node.strategy_data.hook,
+            angle: node.strategy_data.angle,
+            color: node.status_color,
+            size: 0.5,
+          }));
+          setNodes(mappedNodes);
+          
           // Pick a random arbitrage play
-          if (data.data.length > 0) {
-            const randomIndex = Math.floor(Math.random() * data.data.length);
-            setArbitragePlay(data.data[randomIndex]);
-          }
+          const randomIndex = Math.floor(Math.random() * mappedNodes.length);
+          setArbitragePlay(mappedNodes[randomIndex]);
         }
       } catch (error) {
         console.error('Failed to fetch trends:', error);
@@ -117,175 +69,103 @@ export default function MarketingGlobe() {
     fetchTrends();
   }, []);
 
-  // Simple 2D globe visualization
+  // Handle resize for mobile optimization
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animationId: number;
-    let rotation = 0;
-
-    const draw = () => {
-      const width = canvas.width;
-      const height = canvas.height;
-      const centerX = width / 2;
-      const centerY = height / 2;
-      const radius = Math.min(width, height) * 0.4;
-
-      // Clear canvas with black background
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(0, 0, width, height);
-
-      // Draw globe outline
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.strokeStyle = '#333333';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      // Draw grid lines
-      ctx.strokeStyle = '#1a1a1a';
-      for (let lat = -60; lat <= 60; lat += 30) {
-        const y = centerY - (lat / 90) * radius;
-        const xOffset = Math.cos((lat * Math.PI) / 180) * radius;
-        ctx.beginPath();
-        ctx.ellipse(centerX, y, xOffset, 20, 0, 0, Math.PI * 2);
-        ctx.stroke();
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        setDimensions({
+          width: containerRef.current.offsetWidth,
+          height: Math.min(containerRef.current.offsetWidth, 500),
+        });
       }
-
-      // Draw meridians
-      for (let lng = 0; lng < 360; lng += 30) {
-        const x = centerX + Math.cos(((lng + rotation) * Math.PI) / 180) * radius;
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY - radius);
-        ctx.quadraticCurveTo(x, centerY, centerX, centerY + radius);
-        ctx.stroke();
-      }
-
-      // Draw nodes
-      nodes.forEach((node, index) => {
-        const lng = node.coordinates.lng + rotation;
-        const lat = node.coordinates.lat;
-        
-        const x = centerX + Math.cos((lng * Math.PI) / 180) * radius * Math.cos((lat * Math.PI) / 180);
-        const y = centerY - radius * Math.sin((lat * Math.PI) / 180);
-        
-        // Check if node is on visible side of globe
-        const z = Math.cos((lng * Math.PI) / 180) * Math.cos((lat * Math.PI) / 180);
-        if (z > 0) {
-          const size = 4 + (index % 3) * 2;
-          
-          // Pulsing effect
-          const pulse = Math.sin(Date.now() / 500 + index) * 1 + 1;
-          
-          // Draw node
-          ctx.beginPath();
-          ctx.arc(x, y, size * pulse, 0, Math.PI * 2);
-          ctx.fillStyle = node.status_color;
-          ctx.fill();
-          
-          // Glow effect
-          const gradient = ctx.createRadialGradient(x, y, 0, x, y, size * 3);
-          gradient.addColorStop(0, node.status_color + '40');
-          gradient.addColorStop(1, 'transparent');
-          ctx.fillStyle = gradient;
-          ctx.beginPath();
-          ctx.arc(x, y, size * 3, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      });
-
-      rotation += 0.1;
-      animationId = requestAnimationFrame(draw);
     };
 
-    const handleResize = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    draw();
-
-    return () => {
-      cancelAnimationFrame(animationId);
-      window.removeEventListener('resize', handleResize);
-    };
+  // Initialize globe controls
+  useEffect(() => {
+    if (globeRef.current) {
+      const globe = globeRef.current;
+      
+      // Enable controls
+      globe.controls().autoRotate = true;
+      globe.controls().autoRotateSpeed = 0.5;
+      globe.controls().enableZoom = true;
+      globe.controls().minDistance = 150;
+      globe.controls().maxDistance = 300;
+      
+      // Initial camera position
+      globe.pointOfView({ lat: 20, lng: 0, altitude: 2.5 });
+    }
   }, [nodes]);
 
-  const handlePushToStudio = () => {
-    if (arbitragePlay) {
-      // Store in session and redirect
-      sessionStorage.setItem('arbitrage_hook', arbitragePlay.strategy_data.hook);
-      sessionStorage.setItem('arbitrage_angle', arbitragePlay.strategy_data.angle);
+  const handleNodeClick = useCallback((node: NodeData) => {
+    if (globeRef.current) {
+      // Smooth zoom to node
+      globeRef.current.pointOfView(
+        { lat: node.lat, lng: node.lng, altitude: 1.5 },
+        1000
+      );
+    }
+    setSelectedNode(node);
+  }, []);
+
+  const handlePushToStudio = useCallback((node?: NodeData) => {
+    const data = node || arbitragePlay;
+    if (data) {
+      sessionStorage.setItem('arbitrage_hook', data.hook);
+      sessionStorage.setItem('arbitrage_angle', data.angle);
       window.location.href = '/dashboard/studio';
     }
-  };
+  }, [arbitragePlay]);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: 400 }}>
-      {/* Arbitrage Play Card */}
-      {arbitragePlay && (
-        <div style={{
-          position: 'absolute',
-          top: 16,
-          left: 16,
-          right: 16,
-          background: '#FFFFFF',
-          borderRadius: 10,
-          padding: 16,
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-          zIndex: 10,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-          <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#22C55E', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>
-              Arbitrage Play of the Day
-            </div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: '#191919' }}>
-              {arbitragePlay.region_name}: "{arbitragePlay.strategy_data.hook}"
-            </div>
-          </div>
-          <button
-            onClick={handlePushToStudio}
-            style={{
-              padding: '8px 16px',
-              background: '#191919',
-              color: '#FFFFFF',
-              border: 'none',
-              borderRadius: 6,
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            Push to Studio
-          </button>
-        </div>
+    <div 
+      ref={containerRef}
+      style={{ 
+        position: 'relative', 
+        width: '100%', 
+        height: dimensions.height,
+        background: '#000000',
+        borderRadius: 14,
+        overflow: 'hidden',
+      }}
+    >
+      {/* 3D Globe */}
+      {!loading && nodes.length > 0 && (
+        <Globe
+          ref={globeRef}
+          width={dimensions.width}
+          height={dimensions.height}
+          
+          // Globe styling - pitch black with dark charcoal
+          globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
+          backgroundColor="#000000"
+          
+          // Atmosphere
+          atmosphereColor="#1a1a1a"
+          atmosphereAltitude={0.15}
+          
+          // Points (nodes)
+          pointsData={nodes as object[]}
+          pointLat="lat"
+          pointLng="lng"
+          pointAltitude={0.02}
+          pointColor={(d: object) => (d as NodeData).color}
+          pointRadius={(d: object) => 0.3 + ((d as NodeData).size || 0.5) * 0.3}
+          pointLabel={() => ''}
+          onPointClick={(d: object) => handleNodeClick(d as NodeData)}
+          
+          // Mobile optimizations
+          animateIn={true}
+          
+          // Disable expensive features for mobile
+          enablePointerInteraction={true}
+        />
       )}
-
-      {/* Globe Canvas */}
-      <canvas
-        ref={canvasRef}
-        style={{
-          width: '100%',
-          height: '100%',
-          cursor: 'pointer',
-        }}
-        onClick={() => {
-          // Simple click - just show a random node's info
-          if (nodes.length > 0) {
-            const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
-            setSelectedNode(randomNode);
-          }
-        }}
-      />
 
       {/* Loading State */}
       {loading && (
@@ -295,36 +175,179 @@ export default function MarketingGlobe() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'rgba(0, 0, 0, 0.8)',
-          color: '#FFFFFF',
+          background: '#000000',
+          color: '#858585',
+          fontFamily: 'Inter, sans-serif',
         }}>
           Loading Globe...
         </div>
       )}
 
-      {/* Intelligence Card */}
+      {/* Arbitrage Play Card - Above Globe */}
+      {arbitragePlay && (
+        <div style={{
+          position: 'absolute',
+          top: 16,
+          left: 16,
+          right: 16,
+          background: '#191919',
+          borderRadius: 10,
+          padding: 14,
+          zIndex: 10,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+        }}>
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#22C55E', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
+              Arbitrage Play of the Day
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#FFFFFF' }}>
+              {arbitragePlay.region_name}: "{arbitragePlay.hook}"
+            </div>
+          </div>
+          <button
+            onClick={() => handlePushToStudio()}
+            style={{
+              padding: '8px 14px',
+              background: '#22C55E',
+              color: '#000000',
+              border: 'none',
+              borderRadius: 6,
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Push to Studio →
+          </button>
+        </div>
+      )}
+
+      {/* Intelligence Card Overlay */}
       {selectedNode && (
         <>
           <div 
             style={{
               position: 'fixed',
               inset: 0,
-              background: 'rgba(0, 0, 0, 0.5)',
-              zIndex: 999,
+              background: 'rgba(0, 0, 0, 0.85)',
+              zIndex: 100,
             }}
             onClick={() => setSelectedNode(null)}
           />
-          <IntelligenceCard
-            node={selectedNode}
-            onClose={() => setSelectedNode(null)}
-            onPushToStudio={() => {
-              sessionStorage.setItem('arbitrage_hook', selectedNode.strategy_data.hook);
-              sessionStorage.setItem('arbitrage_angle', selectedNode.strategy_data.angle);
-              window.location.href = '/dashboard/studio';
-            }}
-          />
+          <div style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            background: '#191919',
+            borderRadius: '20px 20px 0 0',
+            padding: 24,
+            zIndex: 101,
+            maxHeight: '60vh',
+            overflow: 'auto',
+          }}>
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+              <div>
+                <h3 style={{ fontSize: 20, fontWeight: 700, color: '#FFFFFF', marginBottom: 8 }}>
+                  {selectedNode.region_name}
+                </h3>
+                <span style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  padding: '4px 10px',
+                  borderRadius: 6,
+                  background: selectedNode.color === '#22C55E' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                  color: selectedNode.color,
+                }}>
+                  {selectedNode.niche}
+                </span>
+              </div>
+              <button 
+                onClick={() => setSelectedNode(null)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  fontSize: 28,
+                  cursor: 'pointer',
+                  color: '#858585',
+                  padding: 0,
+                  lineHeight: 1,
+                }}
+              >
+                ×
+              </button>
+            </div>
+            
+            {/* Intelligence Content */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#22C55E', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                Top Performing Hook
+              </div>
+              <p style={{ fontSize: 16, fontWeight: 600, color: '#FFFFFF', marginBottom: 16, lineHeight: 1.4 }}>
+                "{selectedNode.hook}"
+              </p>
+              
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#858585', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                Active Competitor Angles
+              </div>
+              <p style={{ fontSize: 14, color: '#E0E0E0', marginBottom: 16, lineHeight: 1.5 }}>
+                {selectedNode.angle}
+              </p>
+              
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#858585', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                Local Psychology Shift
+              </div>
+              <p style={{ fontSize: 14, color: '#E0E0E0', lineHeight: 1.5 }}>
+                Consumers in {selectedNode.region_name} are responding to value-first messaging over brand recognition.
+              </p>
+            </div>
+
+            {/* Action Button */}
+            <button
+              onClick={() => handlePushToStudio(selectedNode)}
+              style={{
+                width: '100%',
+                padding: 14,
+                background: '#22C55E',
+                color: '#000000',
+                border: 'none',
+                borderRadius: 10,
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              Push to Studio →
+            </button>
+          </div>
         </>
       )}
+
+      {/* Legend */}
+      <div style={{
+        position: 'absolute',
+        bottom: 16,
+        left: 16,
+        display: 'flex',
+        gap: 16,
+        fontSize: 11,
+        color: '#858585',
+        fontFamily: 'Inter, sans-serif',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E' }} />
+          High Converting
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#EF4444' }} />
+          Saturated
+        </div>
+      </div>
     </div>
   );
 }
