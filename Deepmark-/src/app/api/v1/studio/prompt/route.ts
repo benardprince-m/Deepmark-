@@ -68,15 +68,12 @@ export async function POST(request: NextRequest) {
         suggestion_type: type,
       }, 'Content generated successfully');
     } catch (aiError) {
-      // If AI fails, fall back to template (for demo without API key)
       console.error('AI generation failed:', aiError);
-      return successResponse({
-        content: `Here's a draft based on your input:\n\n${user_input}\n\n[AI-generated content would appear here with proper API configuration]`,
-        prompt_used: user_input,
-        provider: 'mock',
-        model: 'template',
-        suggestion_type: type,
-      }, 'Generated using template (AI not configured)');
+      return errorResponse(
+        'AI generation failed. Please check your OpenRouter API configuration.',
+        'ai_error',
+        aiError instanceof Error ? aiError.message : 'Unknown error'
+      );
     }
   } catch (error) {
     console.error('Studio prompt error:', error);
