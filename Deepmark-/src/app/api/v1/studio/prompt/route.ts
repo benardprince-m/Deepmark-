@@ -69,10 +69,11 @@ export async function POST(request: NextRequest) {
       }, 'Content generated successfully');
     } catch (aiError) {
       console.error('AI generation failed:', aiError);
+      const errorMsg = aiError instanceof Error ? aiError.message : 'Unknown error';
       return errorResponse(
-        'AI generation failed. Please check your OpenRouter API configuration.',
+        `AI generation failed: ${errorMsg}`,
         'ai_error',
-        aiError instanceof Error ? aiError.message : 'Unknown error'
+        500
       );
     }
   } catch (error) {
