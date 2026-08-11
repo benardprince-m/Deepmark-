@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getToken } from '@/lib/auth';
+import ThinkingAnimation from '@/components/thinking/ThinkingAnimation';
 
 const contentTypes = [
   { id: 'post', label: 'LinkedIn Post', icon: '📝', description: 'Engaging LinkedIn content' },
@@ -14,6 +15,7 @@ export default function StudioPage() {
   const [selectedType, setSelectedType] = useState('post');
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
+  const [thinking, setThinking] = useState(false);
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
 
@@ -30,10 +32,16 @@ export default function StudioPage() {
     }
   }, []);
 
+  const handleFirstToken = useCallback(() => {
+    // Stop thinking animation when first token arrives
+    setThinking(false);
+  }, []);
+
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
     
     setLoading(true);
+    setThinking(true);
     setError('');
     setResult('');
 
@@ -51,6 +59,9 @@ export default function StudioPage() {
         }),
       });
 
+      // Stop thinking animation
+      setThinking(false);
+
       const data = await response.json();
       
       if (data.success) {
@@ -59,6 +70,7 @@ export default function StudioPage() {
         setError(data.error || 'Generation failed');
       }
     } catch (err) {
+      setThinking(false);
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);
@@ -136,6 +148,18 @@ export default function StudioPage() {
         >
           {loading ? 'Generating with founder energy...' : 'Generate Content'}
         </button>
+
+        {/* // Thinking Animation */}
+        {(loading || thinking) && (
+          <div style={{ marginTop: 24, display: 'flex', justifyContent: 'center' }}>
+            <ThinkingAnimation
+              isActive={thinking}
+              onFirstToken={handleFirstToken}
+              width={250}
+              height={100}
+            />
+          </div>
+        )}
 
         {/* Anti-AI-Slop Badge */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 16, justifyContent: 'center' }}>
