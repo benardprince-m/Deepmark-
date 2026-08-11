@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getToken } from '@/lib/auth';
 
 const contentTypes = [
@@ -16,6 +16,19 @@ export default function StudioPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
+
+  // Load arbitrage data from globe if available
+  useEffect(() => {
+    const arbitrageHook = sessionStorage.getItem('arbitrage_hook');
+    const arbitrageAngle = sessionStorage.getItem('arbitrage_angle');
+    
+    if (arbitrageHook || arbitrageAngle) {
+      const enrichedPrompt = `Use this hook: "${arbitrageHook}". ${arbitrageAngle ? `Strategy: ${arbitrageAngle}.` : ''} ${prompt}`;
+      setPrompt(enrichedPrompt);
+      sessionStorage.removeItem('arbitrage_hook');
+      sessionStorage.removeItem('arbitrage_angle');
+    }
+  }, []);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
@@ -53,40 +66,54 @@ export default function StudioPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">Content Studio</h1>
-        <p className="text-slate-600 mb-8">Generate marketing content with AI</p>
+    <div style={{ minHeight: '100vh', background: '#F6F6F6', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '40px 24px' }}>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#191919', marginBottom: 8 }}>Content Studio</h1>
+        <p style={{ color: '#858585', marginBottom: 32 }}>Generate marketing content with AI • No AI-slop, only founder energy</p>
 
         {/* Content Type Selection */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 32 }}>
           {contentTypes.map((type) => (
             <button
               key={type.id}
               onClick={() => setSelectedType(type.id)}
-              className={`p-4 rounded-xl border-2 transition-all text-left ${
-                selectedType === type.id
-                  ? 'border-black bg-slate-50'
-                  : 'border-slate-200 hover:border-slate-300'
-              }`}
+              style={{
+                padding: 16,
+                borderRadius: 10,
+                border: `2px solid ${selectedType === type.id ? '#191919' : '#E8E8E8'}`,
+                background: selectedType === type.id ? '#EEEEEE' : '#FFFFFF',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: '150ms ease',
+              }}
             >
-              <span className="text-2xl mb-2 block">{type.icon}</span>
-              <h3 className="font-semibold text-slate-900">{type.label}</h3>
-              <p className="text-sm text-slate-500">{type.description}</p>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>{type.icon}</div>
+              <div style={{ fontWeight: 600, color: '#191919', fontSize: 14 }}>{type.label}</div>
+              <div style={{ fontSize: 11, color: '#858585', marginTop: 4 }}>{type.description}</div>
             </button>
           ))}
         </div>
 
         {/* Prompt Input */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+        <div style={{ marginBottom: 24 }}>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#525252', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             What do you want to create?
           </label>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Describe what you want to create... e.g., 'Write a post about how AI is changing startup marketing'"
-            className="w-full h-32 px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent resize-none"
+            style={{
+              width: '100%',
+              height: 120,
+              padding: 14,
+              border: '1px solid #E8E8E8',
+              borderRadius: 10,
+              fontSize: 14,
+              resize: 'none',
+              outline: 'none',
+              fontFamily: 'inherit',
+            }}
           />
         </div>
 
@@ -94,31 +121,48 @@ export default function StudioPage() {
         <button
           onClick={handleGenerate}
           disabled={loading || !prompt.trim()}
-          className="w-full md:w-auto px-8 py-3 bg-black text-white font-medium rounded-xl hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
+          style={{
+            width: '100%',
+            padding: 14,
+            background: '#191919',
+            color: '#FFFFFF',
+            border: 'none',
+            borderRadius: 10,
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: loading || !prompt.trim() ? 'not-allowed' : 'pointer',
+            opacity: loading || !prompt.trim() ? 0.5 : 1,
+          }}
         >
-          {loading ? 'Generating...' : 'Generate Content'}
+          {loading ? 'Generating with founder energy...' : 'Generate Content'}
         </button>
+
+        {/* Anti-AI-Slop Badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 16, justifyContent: 'center' }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E' }} />
+          <span style={{ fontSize: 11, color: '#858585' }}>Anti-AI-slop mode: Raw narratives, unique hooks, no templates</span>
+        </div>
 
         {/* Error */}
         {error && (
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
+          <div style={{ marginTop: 24, padding: 16, background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 10, color: '#DC2626' }}>
             {error}
           </div>
         )}
 
         {/* Result */}
         {result && (
-          <div className="mt-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-slate-900">Generated Content</h3>
+          <div style={{ marginTop: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <h3 style={{ fontWeight: 600, color: '#191919' }}>Generated Content</h3>
               <button
                 onClick={() => navigator.clipboard.writeText(result)}
-                className="text-sm text-slate-600 hover:text-slate-900"
+                style={{ fontSize: 12, color: '#525252', background: 'none', border: 'none', cursor: 'pointer' }}
               >
                 Copy
               </button>
             </div>
-            <div className="p-6 bg-slate-50 border border-slate-200 rounded-xl whitespace-pre-wrap">
+            <div style={{ padding: 20, background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: 10, whiteSpace: 'pre-wrap', fontSize: 14, lineHeight: 1.6 }}>
               {result}
             </div>
           </div>

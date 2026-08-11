@@ -10,7 +10,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const isAdmin = user?.email === 'admin@deepmark.com' || user?.is_admin === true;
+  const isAdmin = user?.email === 'admin@deepmark.com';
 
   const handleSaveWorkspace = async () => {
     setSaving(true);
