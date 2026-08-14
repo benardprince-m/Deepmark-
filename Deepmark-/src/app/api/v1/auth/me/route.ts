@@ -5,7 +5,7 @@ import { successResponse, unauthorizedResponse, serverErrorResponse } from '@/li
 
 export async function GET(request: NextRequest) {
   const userPayload = await getUserFromRequest(request);
-  
+
   if (!userPayload) {
     return unauthorizedResponse();
   }
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   try {
     const { data: user } = await supabaseAdmin
       .from('users')
-      .select('id, email, created_at, updated_at')
+      .select('id, email, email_verified, created_at, updated_at')
       .eq('id', userPayload.userId)
       .is('deleted_at', null)
       .single();

@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    
+
     const validation = loginSchema.safeParse(body);
     if (!validation.success) {
       return errorResponse(validation.error.errors[0].message, 'validation_error');
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     // Find user
     const { data: user } = await supabaseAdmin
       .from('users')
-      .select('id, email, password_hash')
+      .select('id, email, password_hash, email_verified')
       .eq('email', email)
       .is('deleted_at', null)
       .single();
@@ -65,14 +65,18 @@ export async function POST(request: NextRequest) {
       return errorResponse('Invalid email or password', 'invalid_credentials');
     }
 
-    // Generate JWT
-    const token = await signToken({ userId: user.id, email: user.email });
+    // Generate JWT with email_verified status
+    const token = await signToken({ 
+      userId: user.id, 
+      email: user.email,
+      email_verified: user.email_verified 
+    });
 
     return new Response(
       JSON.stringify({
         success: true,
         data: {
-          user: { id: user.id, email: user.email },
+          user: { id: user.id, email: user.email, email_verified: user.email_verified },
           token
         },
         message: 'Login successful'

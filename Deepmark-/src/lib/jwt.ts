@@ -9,6 +9,7 @@ const JWT_EXPIRATION = '7d';
 export interface JWTPayload {
   userId: string;
   email: string;
+  email_verified: boolean;
 }
 
 export async function signToken(payload: JWTPayload): Promise<string> {

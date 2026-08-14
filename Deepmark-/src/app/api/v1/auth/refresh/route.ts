@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    
+
     const validation = refreshSchema.safeParse(body);
     if (!validation.success) {
       return unauthorizedResponse('Invalid request');
@@ -46,15 +46,16 @@ export async function POST(request: NextRequest) {
 
     // Verify the old token (handle expired tokens for refresh)
     const payload = await verifyToken(oldToken);
-    
+
     if (!payload) {
       return unauthorizedResponse('Invalid token');
     }
 
-    // Generate new token with fresh expiration
+    // Generate new token with fresh expiration and email_verified status
     const newToken = await signToken({
       userId: payload.userId,
-      email: payload.email
+      email: payload.email,
+      email_verified: payload.email_verified
     });
 
     return new Response(

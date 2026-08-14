@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    
+
     const validation = signupSchema.safeParse(body);
     if (!validation.success) {
       return errorResponse(validation.error.errors[0].message, 'validation_error');
@@ -51,26 +51,34 @@ export async function POST(request: NextRequest) {
     // Check if user already exists
     const { data: existingUser } = await supabaseAdmin
       .from('users')
-      .select('id')
+      .select('id, email_verified')
       .eq('email', email)
       .is('deleted_at', null)
       .single();
 
     if (existingUser) {
-      return errorResponse('User with this email already exists', 'user_exists');
+      return errorResponse('An account with this email already exists', 'user_exists');
     }
 
     // Hash password
     const passwordHash = await bcrypt.hash(password, 12);
 
+    // Generate verification token and hash it before storing
+    const verificationToken = uuidv4();
+    const verificationTokenHash = await bcrypt.hash(verificationToken, 10);
+    const now = new Date().toISOString();
+    const verificationSentAt = now;
+
     // Create user
     const userId = uuidv4();
-    const now = new Date().toISOString();
 
     const { error: insertError } = await supabaseAdmin.from('users').insert({
       id: userId,
       email,
       password_hash: passwordHash,
+      email_verified: false,
+      verification_token: verificationTokenHash,
+      verification_sent_at: verificationSentAt,
       created_at: now,
       updated_at: now
     });
@@ -90,12 +98,23 @@ export async function POST(request: NextRequest) {
       updated_at: now
     });
 
-    // Generate JWT
-    const token = await signToken({ userId, email });
+    // Log verification link for development (actual email sending requires SMTP service)
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const verificationLink = `${baseUrl}/auth/verify?token=${verificationToken}`;
+    console.log('\n========== EMAIL VERIFICATION ==========');
+    console.log(`To: ${email}`);
+    console.log(`Verification Link: ${verificationLink}`);
+    console.log(`Token expires in: 24 hours`);
+    console.log('==========================================\n');
+
+    // Generate JWT with email_verified=false (user is not yet verified)
+    const token = await signToken({ userId, email, email_verified: false });
 
     return createdResponse({
       user: { id: userId, email },
-      token
+      token,
+      emailVerificationRequired: true,
+      message: 'User created successfully. Please verify your email to enable all features.'
     }, 'User created successfully');
   } catch (error) {
     console.error('Signup error:', error);
