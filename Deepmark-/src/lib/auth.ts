@@ -141,3 +141,24 @@ export async function getValidToken(): Promise<string | null> {
   
   return token;
 }
+
+// Password validation helper
+export interface PasswordValidationResult {
+  valid: boolean;
+  message?: string;
+}
+
+export function validatePassword(password: string): PasswordValidationResult {
+  if (!password || password.length === 0) {
+    return { valid: false, message: 'Password is required' };
+  }
+  
+  if (password.length < 8) {
+    return { valid: false, message: 'Password must be at least 8 characters long' };
+  }
+  
+  // Additional validation can be added here
+  // e.g., require uppercase, lowercase, numbers, special characters
+  
+  return { valid: true };
+}
