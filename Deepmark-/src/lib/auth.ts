@@ -1,5 +1,6 @@
 // Client-side authentication utilities
-// Uses localStorage for token persistence
+// Uses httpOnly cookies for token storage (more secure than localStorage)
+// localStorage kept as fallback for SSR compatibility
 
 const TOKEN_KEY = 'deepmark_token';
 const USER_KEY = 'deepmark_user';
@@ -9,12 +10,20 @@ export interface AuthUser {
   email: string;
 }
 
+/**
+ * Save token to localStorage (fallback for SSR)
+ * Note: This is kept for backward compatibility but cookies are preferred
+ */
 export function saveToken(token: string): void {
   if (typeof window !== 'undefined') {
     localStorage.setItem(TOKEN_KEY, token);
   }
 }
 
+/**
+ * Get token from localStorage (fallback for SSR)
+ * Note: Prefer server-side cookie reading for production
+ */
 export function getToken(): string | null {
   if (typeof window !== 'undefined') {
     return localStorage.getItem(TOKEN_KEY);
@@ -42,10 +51,16 @@ export function getUser(): AuthUser | null {
   return null;
 }
 
+/**
+ * Check if user is authenticated (checks localStorage as fallback)
+ */
 export function isAuthenticated(): boolean {
-  return !!getToken();
+  return !!getUser();
 }
 
+/**
+ * Logout - clears localStorage (cookie is cleared server-side)
+ */
 export function logout(): void {
   if (typeof window !== 'undefined') {
     localStorage.removeItem(TOKEN_KEY);
@@ -53,6 +68,11 @@ export function logout(): void {
   }
 }
 
+/**
+ * Get Authorization header for API requests
+ * Uses cookie-based auth (handled automatically by browser)
+ * Falls back to localStorage token for backward compatibility
+ */
 export function getAuthHeader(): Record<string, string> {
   const token = getToken();
   if (token) {
@@ -61,85 +81,117 @@ export function getAuthHeader(): Record<string, string> {
   return {};
 }
 
+/**
+ * Decode JWT token to check expiration (client-side)
+ */
+export function decodeToken(token: string): Record<string, unknown> | null {
+  try {
+    const payload = token.split('.')[1];
+    return JSON.parse(atob(payload));
+  } catch {
+    return null;
+  }
+}
+
 export function isTokenExpired(): boolean {
   const token = getToken();
   if (!token) return true;
-  
+
   try {
-    const payload = token.split('.')[1];
-    const decoded = JSON.parse(atob(payload));
-    
-    if (decoded.exp) {
-      return decoded.exp * 1000 < Date.now();
+    const decoded = decodeToken(token);
+    if (decoded && decoded.exp) {
+      return (decoded.exp as number) * 1000 < Date.now();
     }
   } catch {
     return true;
   }
-  
+
   return false;
 }
 
 export function isTokenExpiringSoon(thresholdMs: number = 5 * 60 * 1000): boolean {
   const token = getToken();
   if (!token) return true;
-  
+
   try {
-    const payload = token.split('.')[1];
-    const decoded = JSON.parse(atob(payload));
-    
-    if (decoded.exp) {
-      return decoded.exp * 1000 < Date.now() + thresholdMs;
+    const decoded = decodeToken(token);
+    if (decoded && decoded.exp) {
+      return (decoded.exp as number) * 1000 < Date.now() + thresholdMs;
     }
   } catch {
     return true;
   }
-  
+
   return false;
 }
 
+/**
+ * Refresh the authentication token
+ * Uses cookie-based refresh which doesn't require sending token in body
+ */
 export async function refreshToken(): Promise<boolean> {
-  const token = getToken();
-  if (!token) return false;
-  
   try {
     const response = await fetch('/api/v1/auth/refresh', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token })
     });
-    
+
     if (!response.ok) {
       return false;
     }
-    
+
     const data = await response.json();
-    if (data.success && data.data?.token) {
-      saveToken(data.data.token);
-      return true;
-    }
-    
-    return false;
+    return data.success === true;
   } catch {
     return false;
   }
 }
 
+/**
+ * Get a valid token (refresh if needed)
+ * For cookie-based auth, this mainly ensures the token is still valid
+ */
 export async function getValidToken(): Promise<string | null> {
   const token = getToken();
   if (!token) return null;
-  
-  // If token is expired, try to refresh
+
   if (isTokenExpired()) {
     const refreshed = await refreshToken();
     if (refreshed) {
       return getToken();
     }
-    // If refresh failed, clear auth
     logout();
     return null;
   }
-  
+
   return token;
+}
+
+/**
+ * Check if the auth cookie is present
+ * Useful for detecting if user is logged in server-side
+ */
+export async function checkAuthCookie(): Promise<boolean> {
+  try {
+    const response = await fetch('/api/v1/auth/me', {
+      method: 'GET',
+      credentials: 'include',
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Trigger re-authentication by redirecting to login
+ * Use when cookie is not found but should be
+ */
+export function triggerReAuth(): void {
+  if (typeof window !== 'undefined') {
+    logout();
+    window.location.href = '/auth/login';
+  }
 }
 
 // Password validation helper
@@ -152,13 +204,10 @@ export function validatePassword(password: string): PasswordValidationResult {
   if (!password || password.length === 0) {
     return { valid: false, message: 'Password is required' };
   }
-  
+
   if (password.length < 8) {
     return { valid: false, message: 'Password must be at least 8 characters long' };
   }
-  
-  // Additional validation can be added here
-  // e.g., require uppercase, lowercase, numbers, special characters
-  
+
   return { valid: true };
 }

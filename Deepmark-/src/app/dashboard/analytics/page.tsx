@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getToken } from '@/lib/auth';
+// Using httpOnly cookies - no need to pass token manually
 
 interface VelocityData {
   id: string;
@@ -48,9 +48,8 @@ export default function AnalyticsPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const token = getToken();
         const response = await fetch('/api/v1/trends/velocity', {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         });
         const result = await response.json();
         if (result.success) {

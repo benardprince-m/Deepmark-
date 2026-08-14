@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getToken, getUser } from '@/lib/auth';
+import { getUser } from '@/lib/auth';
 
 export default function SettingsPage() {
   const user = getUser();

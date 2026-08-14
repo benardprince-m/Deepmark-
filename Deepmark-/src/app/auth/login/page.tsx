@@ -3,15 +3,7 @@
 import { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { saveToken, saveUser } from '@/lib/auth';
-
-interface LoginResponse {
-  user: {
-    id: string;
-    email: string;
-  };
-  token: string;
-}
+import { saveUser } from '@/lib/auth';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -29,6 +21,7 @@ export default function LoginPage() {
       const response = await fetch('/api/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
@@ -39,9 +32,7 @@ export default function LoginPage() {
         return;
       }
 
-      const result = data.data as LoginResponse;
-      saveToken(result.token);
-      saveUser(result.user);
+      saveUser(data.data.user);
       router.push('/dashboard');
     } catch {
       setError('An unexpected error occurred');
@@ -53,7 +44,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-[400px]">
-        {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-lg bg-black flex items-center justify-center">
@@ -63,7 +53,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Card */}
         <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
           <h1 className="text-xl font-semibold text-slate-900 text-center mb-2">
             Welcome back
@@ -73,14 +62,12 @@ export default function LoginPage() {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Error Message */}
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-600">
                 {error}
               </div>
             )}
 
-            {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
                 Email
@@ -96,7 +83,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
                 Password
@@ -113,7 +99,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
@@ -123,7 +108,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Signup Link */}
           <p className="text-slate-500 text-sm text-center mt-6">
             Don&apos;t have an account?{' '}
             <Link

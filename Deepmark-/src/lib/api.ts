@@ -1,4 +1,5 @@
 // Reusable API helper with authentication
+// Uses httpOnly cookies for authentication (more secure)
 import { getToken, logout } from './auth';
 
 const API_BASE = '/api/v1';
@@ -49,6 +50,7 @@ export async function apiGet<T>(endpoint: string): Promise<T> {
   const response = await fetch(`${API_BASE}${endpoint}`, {
     method: 'GET',
     headers,
+    credentials: 'include',
   });
 
   return handleResponse<T>(response);
@@ -65,6 +67,7 @@ export async function apiPost<T>(endpoint: string, body?: unknown): Promise<T> {
     method: 'POST',
     headers,
     body: body ? JSON.stringify(body) : undefined,
+    credentials: 'include',
   });
 
   return handleResponse<T>(response);
@@ -81,6 +84,7 @@ export async function apiPatch<T>(endpoint: string, body?: unknown): Promise<T> 
     method: 'PATCH',
     headers,
     body: body ? JSON.stringify(body) : undefined,
+    credentials: 'include',
   });
 
   return handleResponse<T>(response);
@@ -96,6 +100,7 @@ export async function apiDelete<T>(endpoint: string): Promise<T> {
   const response = await fetch(`${API_BASE}${endpoint}`, {
     method: 'DELETE',
     headers,
+    credentials: 'include',
   });
 
   return handleResponse<T>(response);

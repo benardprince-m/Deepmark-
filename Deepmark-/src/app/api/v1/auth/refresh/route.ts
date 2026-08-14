@@ -1,11 +1,11 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { verifyToken, signToken } from '@/lib/jwt';
+import { verifyToken, signToken, JWT_EXPIRATION_SECONDS } from '@/lib/jwt';
 import { unauthorizedResponse, serverErrorResponse } from '@/lib/api-response';
 import { rateLimit, rateLimitConfigs, getClientIP, createAuthRateLimitKey } from '@/lib/rate-limit';
 
 const refreshSchema = z.object({
-  token: z.string().min(1, 'Token is required')
+  token: z.string().min(1, 'Token is required').optional()
 });
 
 export async function POST(request: NextRequest) {
@@ -35,17 +35,22 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-
+    const body = await request.json().catch(() => ({}));
     const validation = refreshSchema.safeParse(body);
-    if (!validation.success) {
-      return unauthorizedResponse('Invalid request');
+
+    // Get token from cookie or request body (for backward compatibility)
+    let token = request.cookies.get('deepmark_auth_token')?.value;
+    
+    if (!token && validation.success && validation.data.token) {
+      token = validation.data.token;
     }
 
-    const { token: oldToken } = validation.data;
+    if (!token) {
+      return unauthorizedResponse('No token provided');
+    }
 
     // Verify the old token (handle expired tokens for refresh)
-    const payload = await verifyToken(oldToken);
+    const payload = await verifyToken(token);
 
     if (!payload) {
       return unauthorizedResponse('Invalid token');
@@ -58,20 +63,31 @@ export async function POST(request: NextRequest) {
       email_verified: payload.email_verified
     });
 
-    return new Response(
-      JSON.stringify({
+    // Create response with httpOnly cookie
+    const response = NextResponse.json(
+      {
         success: true,
-        data: { token: newToken },
+        data: { refreshed: true },
         message: 'Token refreshed successfully'
-      }),
+      },
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
           'X-RateLimit-Remaining': rateLimitResult.remaining.toString()
         }
       }
     );
+
+    // Set updated httpOnly cookie
+    response.cookies.set('deepmark_auth_token', newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: JWT_EXPIRATION_SECONDS,
+    });
+
+    return response;
   } catch (error) {
     console.error('Token refresh error:', error);
     return serverErrorResponse();

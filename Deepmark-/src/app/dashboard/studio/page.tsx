@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getToken } from '@/lib/auth';
+// Using httpOnly cookies - token sent automatically
 import ThinkingAnimation from '@/components/thinking/ThinkingAnimation';
 
 const contentTypes = [
@@ -46,13 +46,12 @@ export default function StudioPage() {
     setResult('');
 
     try {
-      const token = getToken();
       const response = await fetch('/api/v1/studio/prompt', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({
           type: selectedType,
           user_input: prompt,

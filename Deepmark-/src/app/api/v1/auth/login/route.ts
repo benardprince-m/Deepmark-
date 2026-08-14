@@ -1,8 +1,8 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { supabaseAdmin } from '@/lib/supabase';
-import { signToken } from '@/lib/jwt';
+import { signToken, JWT_EXPIRATION_SECONDS } from '@/lib/jwt';
 import { errorResponse, serverErrorResponse } from '@/lib/api-response';
 import { rateLimit, rateLimitConfigs, getClientIP, createAuthRateLimitKey } from '@/lib/rate-limit';
 
@@ -66,29 +66,39 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate JWT with email_verified status
-    const token = await signToken({ 
-      userId: user.id, 
+    const token = await signToken({
+      userId: user.id,
       email: user.email,
-      email_verified: user.email_verified 
+      email_verified: user.email_verified
     });
 
-    return new Response(
-      JSON.stringify({
+    // Create response with httpOnly cookie
+    const response = NextResponse.json(
+      {
         success: true,
         data: {
-          user: { id: user.id, email: user.email, email_verified: user.email_verified },
-          token
+          user: { id: user.id, email: user.email, email_verified: user.email_verified }
         },
         message: 'Login successful'
-      }),
+      },
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
           'X-RateLimit-Remaining': rateLimitResult.remaining.toString()
         }
       }
     );
+
+    // Set httpOnly cookie
+    response.cookies.set('deepmark_auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: JWT_EXPIRATION_SECONDS,
+    });
+
+    return response;
   } catch (error) {
     console.error('Login error:', error);
     return serverErrorResponse();

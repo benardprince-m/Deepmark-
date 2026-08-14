@@ -14,6 +14,21 @@ const publicRoutes = [
   '/api/v1/health'
 ];
 
+function extractToken(request: NextRequest): string | null {
+  // First try to get from cookie
+  const cookieToken = request.cookies.get('deepmark_auth_token')?.value;
+  if (cookieToken) {
+    return cookieToken;
+  }
+  
+  // Fallback to Authorization header for backward compatibility
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) {
+    return null;
+  }
+  return authHeader.slice(7);
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -25,17 +40,15 @@ export async function middleware(request: NextRequest) {
 
   // Check for API routes that require authentication
   if (pathname.startsWith('/api/v1/')) {
-    const authHeader = request.headers.get('authorization');
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const token = extractToken(request);
+
+    if (!token) {
       return NextResponse.json(
         { success: false, error: 'unauthorized', message: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const token = authHeader.slice(7);
-    
     try {
       await jwtVerify(token, JWT_SECRET);
       return NextResponse.next();

@@ -18,13 +18,11 @@ export default function SignupPage() {
     setError('');
     setSuccess(false);
 
-    // Validate password confirmation
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
-    // Validate password length
     if (password.length < 8) {
       setError('Password must be at least 8 characters');
       return;
@@ -36,6 +34,7 @@ export default function SignupPage() {
       const response = await fetch('/api/v1/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
@@ -46,7 +45,6 @@ export default function SignupPage() {
         return;
       }
 
-      // Show success message and redirect to login
       setSuccess(true);
       setTimeout(() => {
         router.push('/auth/login');
@@ -61,7 +59,6 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-[400px]">
-        {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-lg bg-black flex items-center justify-center">
@@ -71,7 +68,6 @@ export default function SignupPage() {
           </div>
         </div>
 
-        {/* Card */}
         <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
           <h1 className="text-xl font-semibold text-slate-900 text-center mb-2">
             Create your account
@@ -81,21 +77,18 @@ export default function SignupPage() {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Success Message */}
             {success && (
               <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-600">
                 Account created successfully. Redirecting to login...
               </div>
             )}
 
-            {/* Error Message */}
             {error && !success && (
               <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-600">
                 {error}
               </div>
             )}
 
-            {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
                 Email
@@ -112,7 +105,6 @@ export default function SignupPage() {
               />
             </div>
 
-            {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
                 Password
@@ -130,7 +122,6 @@ export default function SignupPage() {
               />
             </div>
 
-            {/* Confirm Password */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-2">
                 Confirm Password
@@ -148,7 +139,6 @@ export default function SignupPage() {
               />
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading || success}
@@ -158,7 +148,6 @@ export default function SignupPage() {
             </button>
           </form>
 
-          {/* Login Link */}
           <p className="text-slate-500 text-sm text-center mt-6">
             Already have an account?{' '}
             <Link

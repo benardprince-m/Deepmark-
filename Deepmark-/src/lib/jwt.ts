@@ -4,7 +4,11 @@ import { NextRequest } from 'next/server';
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || (() => { throw new Error('JWT_SECRET environment variable is required'); })()
 );
-const JWT_EXPIRATION = '7d';
+
+// Token expiration time in seconds (7 days)
+export const JWT_EXPIRATION_SECONDS = 7 * 24 * 60 * 60;
+
+export const JWT_EXPIRATION = '7d';
 
 export interface JWTPayload {
   userId: string;
@@ -30,6 +34,13 @@ export async function verifyToken(token: string): Promise<JWTPayload | null> {
 }
 
 export function extractTokenFromRequest(request: NextRequest): string | null {
+  // First try to get from cookie
+  const cookieToken = request.cookies.get('deepmark_auth_token')?.value;
+  if (cookieToken) {
+    return cookieToken;
+  }
+  
+  // Fallback to Authorization header for backward compatibility
   const authHeader = request.headers.get('authorization');
   if (!authHeader?.startsWith('Bearer ')) {
     return null;
