@@ -84,7 +84,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const grouped: Record<string, { impressions: number; engagement: number; clicks: number }> = {};
     
     analytics?.forEach(a => {
-      const key = groupBy === 'platform' ? a.platform : a.platform;
+      const key = groupBy === 'day' ? a.recorded_at.split('T')[0] : groupBy === 'week' ? a.recorded_at.substring(0, 10) : groupBy === 'month' ? a.recorded_at.substring(0, 7) : a.platform;
       if (!grouped[key]) {
         grouped[key] = { impressions: 0, engagement: 0, clicks: 0 };
       }
