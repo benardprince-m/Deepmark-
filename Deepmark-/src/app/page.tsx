@@ -2,63 +2,106 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans">
+      <main className="max-w-7xl mx-auto px-6 py-12">
+        {/* Header / Brand */}
+        <header className="flex items-center justify-between mb-16">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-white rounded-sm rotate-[20deg]" />
+            <span className="text-xl font-semibold tracking-tight">DeepMark</span>
+          </div>
+          <span className="text-sm text-[#A1A1AA]">Dashboard</span>
+        </header>
+
+        {/* Hero Metrics — verified from mockup image 2 */}
+        <section className="grid grid-cols-4 gap-4 mb-12">
+          <div className="bg-[#121212] rounded-lg p-6 border border-[#262626]">
+            <h3 className="text-[#A1A1AA] text-sm mb-2">Total Revenue</h3>
+            <p className="text-3xl font-semibold">$23,902</p>
+            <p className="text-sm text-[#22C55E] mt-1">+12.5% from last month</p>
+          </div>
+          <div className="bg-[#121212] rounded-lg p-6 border border-[#262626]">
+            <h3 className="text-[#A1A1AA] text-sm mb-2">Active Users</h3>
+            <p className="text-3xl font-semibold">16,815</p>
+            <p className="text-sm text-[#22C55E] mt-1">+8.1% from last month</p>
+          </div>
+          <div className="bg-[#121212] rounded-lg p-6 border border-[#262626]">
+            <h3 className="text-[#A1A1AA] text-sm mb-2">New Users</h3>
+            <p className="text-3xl font-semibold">1,457</p>
+            <p className="text-sm text-[#EF4444] mt-1">-2.4% from last month</p>
+          </div>
+          <div className="bg-[#121212] rounded-lg p-6 border border-[#262626]">
+            <h3 className="text-[#A1A1AA] text-sm mb-2">Total Members</h3>
+            <p className="text-3xl font-semibold">2,023</p>
+            <p className="text-sm text-[#22C55E] mt-1">+9.4% from last month</p>
+          </div>
+        </section>
+
+        {/* Chart + Content Preview — mockup layout */}
+        <section className="grid grid-cols-3 gap-4">
+          <div className="col-span-2 bg-[#121212] rounded-lg p-6 border border-[#262626]">
+            <h3 className="text-sm font-medium mb-4">Revenue Overview</h3>
+            <div className="h-48 bg-[#0D0D0D] rounded border border-[#171717] flex items-end gap-3 px-4 pb-2">
+              <div className="w-12 bg-[#121212] h-[60%] rounded-t-sm" />
+              <div className="w-12 bg-[#121212] h-[80%] rounded-t-sm" />
+              <div className="w-12 bg-[#171717] h-[35%] rounded-t-sm" />
+              <div className="w-12 bg-[#121212] h-[55%] rounded-t-sm" />
+              <div className="w-12 bg-[#262626] h-[75%] rounded-t-sm" />
+              <div className="w-12 bg-[#121212] h-[45%] rounded-t-sm" />
+            </div>
+          </div>
+          <div className="bg-[#121212] rounded-lg p-6 border border-[#262626]">
+            <h3 className="text-sm font-medium mb-2">Community Growth</h3>
+            <div className="flex items-center gap-4">
+              <div className="w-24 h-24 rounded-full border-[6px] border-[#262626] border-t-[#22C55E] flex items-center justify-center">
+                <span className="text-2xl font-bold">45%</span>
+              </div>
+              <p className="text-sm text-[#A1A1AA]">+9.2% from last month</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Upcoming Content Table — verified per mockup */}
+        <section className="mt-12 bg-[#121212] rounded-lg border border-[#262626] p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Upcoming Content</h2>
+            <a href="#" className="text-sm text-[#A1A1AA] hover:text-white">View all content &rarr;</a>
+          </div>
+          <table className="w-full text-sm">
+            <thead className="text-[#A1A1AA] border-b border-[#262626]">
+              <tr>
+                <th className="text-left py-2">Title</th>
+                <th className="text-left py-2">Platform</th>
+                <th className="text-left py-2">Publish Date</th>
+                <th className="text-left py-2">Status</th>
+                <th className="text-left py-2">Owner</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-[#171717]">
+                <td className="py-3">The quiet transition from code to marketing</td>
+                <td>LinkedIn</td>
+                <td>2 Sep 2026</td>
+                <td><span className="bg-[#171717] text-[#A1A1AA] px-2 py-0.5 rounded text-xs">Scheduled</span></td>
+                <td>DM / You</td>
+              </tr>
+              <tr className="border-b border-[#171717]">
+                <td className="py-3">Why early traffic doesn't solve positioning</td>
+                <td>X (Twitter)</td>
+                <td>4 Sep 2026</td>
+                <td><span className="bg-[#171717] text-[#A1A1AA] px-2 py-0.5 rounded text-xs">In Progress</span></td>
+                <td>DM / You</td>
+              </tr>
+              <tr>
+                <td className="py-3">DeepMark Product Update</td>
+                <td>YouTube</td>
+                <td>6 Sep 2026</td>
+                <td><span className="bg-[#171717] text-[#A1A1AA] px-2 py-0.5 rounded text-xs">Draft</span></td>
+                <td>DM / You</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
       </main>
     </div>
   );
