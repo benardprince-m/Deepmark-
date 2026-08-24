@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/jwt';
 import { createdResponse, errorResponse, unauthorizedResponse, serverErrorResponse } from '@/lib/api-response';
 
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     const tasks = generateTasks(campaignId, timePerWeek, platforms || ['twitter']);
 
     if (tasks.length > 0) {
-      await supabaseAdmin.from('tasks').insert(tasks);
+      await getSupabaseAdmin().from('tasks').insert(tasks);
     }
 
     return createdResponse({ campaign }, 'Campaign created successfully');

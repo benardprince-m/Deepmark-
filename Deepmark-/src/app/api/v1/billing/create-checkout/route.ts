@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 export const dynamic = 'force-dynamic';
 import { z } from 'zod';
 import { stripe, PLAN_PRICE_IDS } from '@/lib/stripe';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/jwt';
 import { successResponse, errorResponse, unauthorizedResponse, serverErrorResponse } from '@/lib/api-response';
 

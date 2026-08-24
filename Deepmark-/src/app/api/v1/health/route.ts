@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 
 export async function GET() {
   const startTime = Date.now();
   
   try {
     // Check database connection
-    const { error: dbError } = await supabase.from('users').select('id').limit(1);
+    const { error: dbError } = await getSupabaseClient().from('users').select('id').limit(1);
     
     return NextResponse.json({
       success: true,

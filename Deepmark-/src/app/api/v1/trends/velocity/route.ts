@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { getUserFromRequest } from '@/lib/jwt';
 import { successResponse, errorResponse, unauthorizedResponse } from '@/lib/api-response';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   const userPayload = await getUserFromRequest(request);

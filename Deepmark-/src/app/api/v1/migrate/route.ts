@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { successResponse, errorResponse, serverErrorResponse } from '@/lib/api-response';
 
 // Environment variables - must be set
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://emhsbpbewhatkwlznanr.supabase.co';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://emhsbpbewhatkwlznanr.getSupabaseClient().co';
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const MIGRATION_SQL = `

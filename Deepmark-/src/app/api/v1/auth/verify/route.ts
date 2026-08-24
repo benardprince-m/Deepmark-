@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import { successResponse, errorResponse, serverErrorResponse } from '@/lib/api-response';
 import { rateLimit, rateLimitConfigs, getClientIP } from '@/lib/rate-limit';
 

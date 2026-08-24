@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/jwt';
 import { successResponse, unauthorizedResponse, serverErrorResponse } from '@/lib/api-response';
 
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
             clicks: velocity.link_clicks            // Use actual clicks
           };
 
-          await supabaseAdmin.from('analytics').insert({
+          await getSupabaseAdmin().from('analytics').insert({
             id: uuidv4(),
             content_id: velocity.content_id,
             platform: platformMap[velocity.content_id] || 'web',
