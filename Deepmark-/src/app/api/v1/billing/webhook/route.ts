@@ -1,8 +1,10 @@
 import { NextRequest } from 'next/server';
 import { headers } from 'next/headers';
 import { stripe, getPlanFromPriceId } from '@/lib/stripe';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import Stripe from 'stripe';
+
+export const dynamic = 'force-dynamic';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
