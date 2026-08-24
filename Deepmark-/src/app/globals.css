@@ -1,31 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
-/* DeepMark Locked Design System — Monochrome Dark (Aug 2026) */
-/* Verified fix: No purple (#7C3AED) removed; green/red/blue-reserved added */
-
 :root {
-  /* Deep background stack — monochrome dark */
-  --bg-deep: #0A0A0A;
-  --bg-dark: #0D0D0D;
-  --bg-surface: #111111;
-  --bg-card: #121212;
-  --bg-elevated: #171717;
-  --divider: #262626;
-
-  /* Functional colors — restrained, no neon */
-  --accent: #22C55E;       /* Green — positive / CTA / performance */
-  --error: #EF4444;         /* Red — errors / negative metrics */
-  --blue-memory: #3B82F6;   /* Blue — RESERVED for neural-memory signals ONLY */
-
-  /* Typography — dense editorial */
-  --background: var(--bg-deep);
+  /* DeepMark Design System Colors - Locked Monochrome Dark Palette */
+  --background: #0A0A0A;
   --foreground: #FFFFFF;
-  --muted: #A1A1AA;
-  --success: var(--accent);
-  --card: var(--bg-card);
-  --border: var(--divider);
-  --placeholder: #6B6B6B;
+  --muted: #858585;
+  --accent: #22C55E;
+  --success: #22C55E;
+  --error: #EF4444;
+  --card: #121212;
+  --border: #262626;
+  --placeholder: #525252;
+  --blue-memory: #3B82F6;
 }
 
 @theme inline {
@@ -38,36 +25,75 @@
   --color-card: var(--card);
   --color-border: var(--border);
   --color-placeholder: var(--placeholder);
+  --color-blue-memory: var(--blue-memory);
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 14px;
-  line-height: 1.35;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Typography — tight editorial density */
-h1 { font-size: 24px; font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; }
-h2 { font-size: 18px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; }
-h3 { font-size: 16px; font-weight: 600; line-height: 1.4; letter-spacing: -0.01em; }
+/* Typography */
+h1 {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
 
-/* Focus — uses green accent (not purple) */
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h2 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+}
 
-/* Selection — green (not purple) */
-::selection { background: var(--accent); color: #0A0A0A; }
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+}
 
-/* Scrollbar — monochrome, no glass */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--bg-deep); }
-::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--bg-elevated); }
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Selection styles */
+::selection {
+  background: var(--accent);
+  color: var(--background);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}

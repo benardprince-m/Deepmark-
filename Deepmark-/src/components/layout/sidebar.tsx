@@ -21,7 +21,7 @@ export function Sidebar() {
         {/* Logo */}
         <div className="flex h-16 items-center border-b border-[#374151] px-6">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-[#7C3AED]" />
+            <div className="h-8 w-8 rounded-lg bg-[#22C55E]" />
             <span className="text-lg font-semibold text-white">DeepMark</span>
           </Link>
         </div>
@@ -38,7 +38,7 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-[#7C3AED] text-white"
+                    ? "bg-[#22C55E] text-white"
                     : "text-[#6B7280] hover:bg-[#1F2937] hover:text-white"
                 )}
               >

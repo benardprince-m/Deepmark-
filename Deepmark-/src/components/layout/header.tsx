@@ -22,7 +22,7 @@ export function Header({ title, subtitle, action }: HeaderProps) {
           <Bell className="h-5 w-5" />
         </Button>
         <button className="flex items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-[#1F2937]">
-          <div className="h-8 w-8 rounded-full bg-[#7C3AED]" />
+          <div className="h-8 w-8 rounded-full bg-[#22C55E]" />
           <ChevronDown className="h-4 w-4 text-[#6B7280]" />
         </button>
       </div>
