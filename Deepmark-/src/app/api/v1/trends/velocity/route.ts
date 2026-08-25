@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Get user's workspace
-    const { data: workspaces } = await supabaseAdmin
+    const { data: workspaces } = await getSupabaseAdmin()
       .from('workspaces')
       .select('id')
       .eq('user_id', userPayload.userId)
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     const workspaceId = workspaces[0].id;
 
     // Get velocity tracking data
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('content_velocity_tracking')
       .select(`
         *,
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     const { content_id, source_trend_id, link_clicks, signups, hourly_signals } = body;
 
     // Get user's workspace
-    const { data: workspaces } = await supabaseAdmin
+    const { data: workspaces } = await getSupabaseAdmin()
       .from('workspaces')
       .select('id')
       .eq('user_id', userPayload.userId)
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     const isVerified = convRate >= 15;
 
     // Upsert velocity tracking
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('content_velocity_tracking')
       .upsert({
         workspace_id: workspaceId,

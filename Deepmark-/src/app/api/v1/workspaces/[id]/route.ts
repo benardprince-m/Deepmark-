@@ -13,7 +13,7 @@ interface RouteParams {
 }
 
 async function getWorkspaceWithAccess(workspaceId: string, userId: string) {
-  const { data: workspace } = await supabaseAdmin
+  const { data: workspace } = await getSupabaseAdmin()
     .from('workspaces')
     .select('*')
     .eq('id', workspaceId)
@@ -39,13 +39,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Get workspace stats
-    const { count: startupsCount } = await supabaseAdmin
+    const { count: startupsCount } = await getSupabaseAdmin()
       .from('startups')
       .select('*', { count: 'exact', head: true })
       .eq('workspace_id', id)
       .is('deleted_at', null);
 
-    const { count: campaignsCount } = await supabaseAdmin
+    const { count: campaignsCount } = await getSupabaseAdmin()
       .from('campaigns')
       .select('*', { count: 'exact', head: true })
       .eq('startup_id', id)
@@ -88,7 +88,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { name } = validation.data;
     const now = new Date().toISOString();
 
-    const { data: updatedWorkspace, error: updateError } = await supabaseAdmin
+    const { data: updatedWorkspace, error: updateError } = await getSupabaseAdmin()
       .from('workspaces')
       .update({ name, updated_at: now })
       .eq('id', id)
@@ -124,7 +124,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const now = new Date().toISOString();
 
     // Soft delete
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await getSupabaseAdmin()
       .from('workspaces')
       .update({ deleted_at: now, updated_at: now })
       .eq('id', id);

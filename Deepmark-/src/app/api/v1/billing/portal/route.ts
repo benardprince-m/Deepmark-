@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   if (!userPayload) return unauthorizedResponse();
 
   try {
-    const { data: user } = await supabaseAdmin
+    const { data: user } = await getSupabaseAdmin()
       .from('users')
       .select('stripe_customer_id')
       .eq('id', userPayload.userId)

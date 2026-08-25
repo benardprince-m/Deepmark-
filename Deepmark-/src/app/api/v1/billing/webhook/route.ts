@@ -16,7 +16,7 @@ async function updateUserSubscription(
   periodStart: Date,
   periodEnd: Date
 ) {
-  await supabaseAdmin
+  await getSupabaseAdmin()
     .from('workspaces')
     .update({
       stripe_subscription_id: subscriptionId,
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
           const plan = session.metadata?.plan || subscription.metadata?.plan || 'starter';
           
           if (userId) {
-            await supabaseAdmin
+            await getSupabaseAdmin()
               .from('users')
               .update({ stripe_customer_id: session.customer as string })
               .eq('id', userId);
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
         const userId = subscription.metadata?.userId;
         
         if (userId) {
-          await supabaseAdmin
+          await getSupabaseAdmin()
             .from('workspaces')
             .update({
               stripe_subscription_id: null,

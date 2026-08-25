@@ -16,7 +16,7 @@ interface RouteParams {
 }
 
 async function getMemoryWithAccess(memoryId: string, userId: string) {
-  const { data: memory } = await supabaseAdmin
+  const { data: memory } = await getSupabaseAdmin()
     .from('memory')
     .select('*, workspaces!inner(user_id)')
     .eq('id', memoryId)
@@ -62,7 +62,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
     const { title, content, confidence, category } = validation.data;
     const now = new Date().toISOString();
-    const { data: updatedMemory, error: updateError } = await supabaseAdmin
+    const { data: updatedMemory, error: updateError } = await getSupabaseAdmin()
       .from('memory')
       .update({ title, content, confidence, category, updated_at: now })
       .eq('id', id)
@@ -91,7 +91,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return notFoundResponse('Memory not found');
     }
     const now = new Date().toISOString();
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await getSupabaseAdmin()
       .from('memory')
       .update({ deleted_at: now, updated_at: now })
       .eq('id', id);

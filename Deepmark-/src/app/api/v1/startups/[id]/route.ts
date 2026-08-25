@@ -18,7 +18,7 @@ interface RouteParams {
 }
 
 async function getStartupWithAccess(startupId: string, userId: string) {
-  const { data: startup } = await supabaseAdmin
+  const { data: startup } = await getSupabaseAdmin()
     .from('startups')
     .select('*, workspaces!inner(user_id)')
     .eq('id', startupId)
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Get campaigns for this startup
-    const { data: campaigns } = await supabaseAdmin
+    const { data: campaigns } = await getSupabaseAdmin()
       .from('campaigns')
       .select('*')
       .eq('startup_id', id)
@@ -85,7 +85,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { name, website, description, target_audience, available_time_per_week, main_goal } = validation.data;
     const now = new Date().toISOString();
 
-    const { data: updatedStartup, error: updateError } = await supabaseAdmin
+    const { data: updatedStartup, error: updateError } = await getSupabaseAdmin()
       .from('startups')
       .update({
         name,
@@ -128,7 +128,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const now = new Date().toISOString();
 
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await getSupabaseAdmin()
       .from('startups')
       .update({ deleted_at: now, updated_at: now })
       .eq('id', id);

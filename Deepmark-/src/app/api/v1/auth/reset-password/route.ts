@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find all users with non-null reset tokens (stored as hash)
-    const { data: users } = await supabaseAdmin
+    const { data: users } = await getSupabaseAdmin()
       .from('users')
       .select('id, email, reset_token, reset_sent_at')
       .not('reset_token', 'is', null)
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
 
       if (now > expiresAt) {
         // Clear expired token
-        await supabaseAdmin
+        await getSupabaseAdmin()
           .from('users')
           .update({ reset_token: null, updated_at: new Date().toISOString() })
           .eq('id', user.id);
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
 
     // Update password and clear reset token
     const now = new Date().toISOString();
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await getSupabaseAdmin()
       .from('users')
       .update({
         password_hash: newPasswordHash,

@@ -17,7 +17,7 @@ interface RouteParams {
 }
 
 async function getTaskWithAccess(taskId: string, userId: string) {
-  const { data: task } = await supabaseAdmin
+  const { data: task } = await getSupabaseAdmin()
     .from('tasks')
     .select('*, campaigns(*, startups(*, workspaces!inner(user_id)))')
     .eq('id', taskId)
@@ -71,7 +71,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
     if (due_date !== undefined) updates.due_date = due_date;
     if (priority !== undefined) updates.priority = priority;
-    const { data: updatedTask, error: updateError } = await supabaseAdmin
+    const { data: updatedTask, error: updateError } = await getSupabaseAdmin()
       .from('tasks')
       .update(updates)
       .eq('id', id)

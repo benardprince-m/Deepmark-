@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { data: user } = await supabaseAdmin
+    const { data: user } = await getSupabaseAdmin()
       .from('users')
       .select('id, email, email_verified, created_at, updated_at')
       .eq('id', userPayload.userId)

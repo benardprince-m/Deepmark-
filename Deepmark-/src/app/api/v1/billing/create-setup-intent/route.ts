@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     let stripeCustomerId = customerId;
 
     if (!stripeCustomerId) {
-      const { data: user } = await supabaseAdmin
+      const { data: user } = await getSupabaseAdmin()
         .from('users')
         .select('stripe_customer_id, email')
         .eq('id', userPayload.userId)
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
         stripeCustomerId = customer.id;
 
-        await supabaseAdmin
+        await getSupabaseAdmin()
           .from('users')
           .update({
             stripe_customer_id: stripeCustomerId,

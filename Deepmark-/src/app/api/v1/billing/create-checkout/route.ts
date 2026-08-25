@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       return errorResponse('Invalid plan', 'invalid_plan', 400);
     }
 
-    const { data: user } = await supabaseAdmin
+    const { data: user } = await getSupabaseAdmin()
       .from('users')
       .select('stripe_customer_id, email')
       .eq('id', userPayload.userId)
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
       stripeCustomerId = customer.id;
 
-      await supabaseAdmin
+      await getSupabaseAdmin()
         .from('users')
         .update({
           stripe_customer_id: stripeCustomerId,
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const workspace = workspaceId
-      ? await supabaseAdmin
+      ? await getSupabaseAdmin()
           .from('workspaces')
           .select('id, name')
           .eq('id', workspaceId)

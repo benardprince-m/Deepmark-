@@ -15,7 +15,7 @@ const createContentSchema = z.object({
 });
 
 async function verifyCampaignAccess(campaignId: string, userId: string) {
-  const { data: campaign } = await supabaseAdmin
+  const { data: campaign } = await getSupabaseAdmin()
     .from('campaigns')
     .select('id')
     .eq('id', campaignId)
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     const contentId = uuidv4();
     const now = new Date().toISOString();
 
-    const { data: newContent, error: insertError } = await supabaseAdmin
+    const { data: newContent, error: insertError } = await getSupabaseAdmin()
       .from('content')
       .insert({
         id: contentId,

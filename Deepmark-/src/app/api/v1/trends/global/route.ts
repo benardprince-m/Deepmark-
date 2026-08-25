@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   if (!userPayload) return unauthorizedResponse();
 
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('global_trend_nodes')
       .select('*')
       .order('conversion_velocity_score', { ascending: false });

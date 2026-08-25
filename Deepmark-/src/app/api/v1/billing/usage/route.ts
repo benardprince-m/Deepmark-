@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   if (!userPayload) return unauthorizedResponse();
 
   try {
-    const { data: workspace } = await supabaseAdmin
+    const { data: workspace } = await getSupabaseAdmin()
       .from('workspaces')
       .select('id, plan, plan_status, plan_updated_at, subscription_current_period_end')
       .eq('user_id', userPayload.userId)
@@ -26,19 +26,19 @@ export async function GET(request: NextRequest) {
     const plan = (workspace.plan as 'free' | 'starter' | 'pro' | 'enterprise') || 'free';
     const planDetails = SUBSCRIPTION_PLANS.find(p => p.id === plan);
 
-    const { count: workspacesUsed } = await supabaseAdmin
+    const { count: workspacesUsed } = await getSupabaseAdmin()
       .from('workspaces')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userPayload.userId)
       .is('deleted_at', null);
 
-    const { count: startupsUsed } = await supabaseAdmin
+    const { count: startupsUsed } = await getSupabaseAdmin()
       .from('startups')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userPayload.userId)
       .is('deleted_at', null);
 
-    const { count: contentGenerated } = await supabaseAdmin
+    const { count: contentGenerated } = await getSupabaseAdmin()
       .from('content')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userPayload.userId)

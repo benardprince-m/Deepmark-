@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     const { workspace_id, name, website, description, target_audience, available_time_per_week, main_goal } = validation.data;
 
     // Verify workspace ownership
-    const { data: workspace } = await supabaseAdmin
+    const { data: workspace } = await getSupabaseAdmin()
       .from('workspaces')
       .select('id')
       .eq('id', workspace_id)
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     const startupId = uuidv4();
     const now = new Date().toISOString();
 
-    const { data: startup, error: insertError } = await supabaseAdmin
+    const { data: startup, error: insertError } = await getSupabaseAdmin()
       .from('startups')
       .insert({
         id: startupId,

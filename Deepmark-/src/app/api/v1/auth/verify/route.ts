@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     // Find all users with non-null verification tokens (stored as hash)
     // We need to iterate since bcrypt comparison is done in application code
-    const { data: users } = await supabaseAdmin
+    const { data: users } = await getSupabaseAdmin()
       .from('users')
       .select('id, email, email_verified, verification_token, verification_sent_at')
       .not('verification_token', 'is', null)
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
 
       if (now > expiresAt) {
         // Clear expired token
-        await supabaseAdmin
+        await getSupabaseAdmin()
           .from('users')
           .update({ verification_token: null, updated_at: new Date().toISOString() })
           .eq('id', user.id);
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     // Mark email as verified and clear the token
     const now = new Date().toISOString();
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await getSupabaseAdmin()
       .from('users')
       .update({
         email_verified: true,

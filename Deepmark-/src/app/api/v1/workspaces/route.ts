@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { data: workspaces } = await supabaseAdmin
+    const { data: workspaces } = await getSupabaseAdmin()
       .from('workspaces')
       .select('*')
       .eq('user_id', userPayload.userId)
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     const workspaceId = uuidv4();
     const now = new Date().toISOString();
 
-    const { data: workspace, error: insertError } = await supabaseAdmin
+    const { data: workspace, error: insertError } = await getSupabaseAdmin()
       .from('workspaces')
       .insert({
         id: workspaceId,

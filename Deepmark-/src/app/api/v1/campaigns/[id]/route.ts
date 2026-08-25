@@ -18,7 +18,7 @@ interface RouteParams {
 }
 
 async function getCampaignWithAccess(campaignId: string, userId: string) {
-  const { data: campaign } = await supabaseAdmin
+  const { data: campaign } = await getSupabaseAdmin()
     .from('campaigns')
     .select('*, startups(*, workspaces!inner(user_id))')
     .eq('id', campaignId)
@@ -44,14 +44,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Get tasks for this campaign
-    const { data: tasks } = await supabaseAdmin
+    const { data: tasks } = await getSupabaseAdmin()
       .from('tasks')
       .select('*')
       .eq('campaign_id', id)
       .order('due_date', { ascending: true });
 
     // Get content for this campaign
-    const { data: content } = await supabaseAdmin
+    const { data: content } = await getSupabaseAdmin()
       .from('content')
       .select('*')
       .eq('campaign_id', id)
@@ -93,7 +93,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { name, theme, goals, status, start_date, end_date } = validation.data;
     const now = new Date().toISOString();
 
-    const { data: updatedCampaign, error: updateError } = await supabaseAdmin
+    const { data: updatedCampaign, error: updateError } = await getSupabaseAdmin()
       .from('campaigns')
       .update({
         name,
@@ -136,7 +136,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const now = new Date().toISOString();
 
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await getSupabaseAdmin()
       .from('campaigns')
       .update({ deleted_at: now, updated_at: now })
       .eq('id', id);

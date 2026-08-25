@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     const { campaign_id, title, description, due_date, priority } = validation.data;
 
-    const { data: campaign } = await supabaseAdmin
+    const { data: campaign } = await getSupabaseAdmin()
       .from('campaigns')
       .select('id')
       .eq('id', campaign_id)
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     const taskId = uuidv4();
     const now = new Date().toISOString();
 
-    const { data: task, error: insertError } = await supabaseAdmin
+    const { data: task, error: insertError } = await getSupabaseAdmin()
       .from('tasks')
       .insert({
         id: taskId,

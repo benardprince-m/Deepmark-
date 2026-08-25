@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 
   try {
     // Get user's workspace
-    const { data: workspaces } = await supabaseAdmin
+    const { data: workspaces } = await getSupabaseAdmin()
       .from('workspaces')
       .select('id')
       .eq('user_id', userPayload.userId)
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     const workspaceId = workspaces[0].id;
 
     // Get content with velocity tracking data
-    const { data: velocityData } = await supabaseAdmin
+    const { data: velocityData } = await getSupabaseAdmin()
       .from('content_velocity_tracking')
       .select(`
         content_id,
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     const contentIds = velocityData?.map(v => v.content_id) || [];
     const platformMap: Record<string, string> = {};
     if (contentIds.length > 0) {
-      const { data: contentData } = await supabaseAdmin
+      const { data: contentData } = await getSupabaseAdmin()
         .from('content')
         .select('id, platform')
         .in('id', contentIds);
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       for (const velocity of velocityData) {
         try {
           const today = new Date().toISOString().split('T')[0];
-          const { data: existing } = await supabaseAdmin
+          const { data: existing } = await getSupabaseAdmin()
             .from('analytics')
             .select('id')
             .eq('content_id', velocity.content_id)

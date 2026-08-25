@@ -18,7 +18,7 @@ interface RouteParams {
 }
 
 async function getContentWithAccess(contentId: string, userId: string) {
-  const { data: content } = await supabaseAdmin
+  const { data: content } = await getSupabaseAdmin()
     .from('content')
     .select('*, campaigns(*, startups(*, workspaces!inner(user_id)))')
     .eq('id', contentId)
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     if (!content) {
       return notFoundResponse('Content not found');
     }
-    const { data: analytics } = await supabaseAdmin
+    const { data: analytics } = await getSupabaseAdmin()
       .from('analytics')
       .select('*')
       .eq('content_id', id)
@@ -69,7 +69,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
     const { title, content: contentText, type, status, scheduled_for, platform } = validation.data;
     const now = new Date().toISOString();
-    const { data: updatedContent, error: updateError } = await supabaseAdmin
+    const { data: updatedContent, error: updateError } = await getSupabaseAdmin()
       .from('content')
       .update({ title, content: contentText, type, status, scheduled_for, platform, updated_at: now })
       .eq('id', id)
@@ -98,7 +98,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return notFoundResponse('Content not found');
     }
     const now = new Date().toISOString();
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await getSupabaseAdmin()
       .from('content')
       .update({ deleted_at: now, updated_at: now })
       .eq('id', id);

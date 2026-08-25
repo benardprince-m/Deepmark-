@@ -8,7 +8,7 @@ interface RouteParams {
 }
 
 async function verifyStartupAccess(startupId: string, userId: string) {
-  const { data: startup } = await supabaseAdmin
+  const { data: startup } = await getSupabaseAdmin()
     .from('startups')
     .select('id')
     .eq('id', startupId)
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Get all campaigns for this startup
-    const { data: campaigns } = await supabaseAdmin
+    const { data: campaigns } = await getSupabaseAdmin()
       .from('campaigns')
       .select('id')
       .eq('startup_id', startup_id)
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Get all analytics for content in these campaigns
-    let query = supabaseAdmin
+    let query = getSupabaseAdmin()
       .from('analytics')
       .select('*')
       .in('content_id', campaignIds);

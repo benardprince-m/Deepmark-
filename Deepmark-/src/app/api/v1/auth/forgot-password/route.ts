@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     const { email } = validation.data;
 
     // Find user by email
-    const { data: user } = await supabaseAdmin
+    const { data: user } = await getSupabaseAdmin()
       .from('users')
       .select('id, email')
       .eq('email', email)
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     const now = new Date().toISOString();
 
     // Store hashed token in database
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await getSupabaseAdmin()
       .from('users')
       .update({
         reset_token: resetTokenHash,

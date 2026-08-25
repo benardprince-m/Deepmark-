@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     const { startup_id, name, theme, goals, platforms, start_date, end_date } = validation.data;
 
     // Verify startup ownership
-    const { data: startup } = await supabaseAdmin
+    const { data: startup } = await getSupabaseAdmin()
       .from('startups')
       .select('*, workspaces!inner(user_id)')
       .eq('id', startup_id)
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     const startDate = start_date || now.split('T')[0];
     const endDate = end_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-    const { data: campaign, error: insertError } = await supabaseAdmin
+    const { data: campaign, error: insertError } = await getSupabaseAdmin()
       .from('campaigns')
       .insert({
         id: campaignId,

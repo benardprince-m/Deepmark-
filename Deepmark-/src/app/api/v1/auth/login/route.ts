@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     const { email, password } = validation.data;
 
     // Find user
-    const { data: user } = await supabaseAdmin
+    const { data: user } = await getSupabaseAdmin()
       .from('users')
       .select('id, email, password_hash, email_verified')
       .eq('email', email)

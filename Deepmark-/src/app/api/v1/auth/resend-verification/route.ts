@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     const { email } = validation.data;
 
     // Find user by email
-    const { data: user } = await supabaseAdmin
+    const { data: user } = await getSupabaseAdmin()
       .from('users')
       .select('id, email, email_verified')
       .eq('email', email)
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     const now = new Date().toISOString();
 
     // Update user's verification token
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await getSupabaseAdmin()
       .from('users')
       .update({
         verification_token: verificationTokenHash,

@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     const { email, password } = validation.data;
 
     // Check if user already exists
-    const { data: existingUser } = await supabaseAdmin
+    const { data: existingUser } = await getSupabaseAdmin()
       .from('users')
       .select('id, email_verified')
       .eq('email', email)

@@ -18,7 +18,7 @@ interface RouteParams {
 }
 
 async function verifyWorkspaceAccess(workspaceId: string, userId: string) {
-  const { data: workspace } = await supabaseAdmin
+  const { data: workspace } = await getSupabaseAdmin()
     .from('workspaces')
     .select('id')
     .eq('id', workspaceId)
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return notFoundResponse('Workspace not found');
     }
 
-    let query = supabaseAdmin
+    let query = getSupabaseAdmin()
       .from('memory')
       .select('*')
       .eq('workspace_id', workspace_id)
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const memoryId = uuidv4();
     const now = new Date().toISOString();
 
-    const { data: memory, error: insertError } = await supabaseAdmin
+    const { data: memory, error: insertError } = await getSupabaseAdmin()
       .from('memory')
       .insert({
         id: memoryId,
