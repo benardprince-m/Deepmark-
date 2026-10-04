@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 // Using httpOnly cookies - token sent automatically
 import ThinkingAnimation from '@/components/thinking/ThinkingAnimation';
 
@@ -13,35 +13,28 @@ const contentTypes = [
 
 export default function StudioPage() {
   const [selectedType, setSelectedType] = useState('post');
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    const arbitrageHook = sessionStorage.getItem('arbitrage_hook');
+    const arbitrageAngle = sessionStorage.getItem('arbitrage_angle');
+    sessionStorage.removeItem('arbitrage_hook');
+    sessionStorage.removeItem('arbitrage_angle');
+    return arbitrageHook || arbitrageAngle
+      ? `Use this hook: "${arbitrageHook || ''}". ${arbitrageAngle ? `Strategy: ${arbitrageAngle}.` : ''}`
+      : '';
+  });
   const [loading, setLoading] = useState(false);
-  const [thinking, setThinking] = useState(false);
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
 
-  // Load arbitrage data from globe if available
-  useEffect(() => {
-    const arbitrageHook = sessionStorage.getItem('arbitrage_hook');
-    const arbitrageAngle = sessionStorage.getItem('arbitrage_angle');
-    
-    if (arbitrageHook || arbitrageAngle) {
-      const enrichedPrompt = `Use this hook: "${arbitrageHook}". ${arbitrageAngle ? `Strategy: ${arbitrageAngle}.` : ''} ${prompt}`;
-      setPrompt(enrichedPrompt);
-      sessionStorage.removeItem('arbitrage_hook');
-      sessionStorage.removeItem('arbitrage_angle');
-    }
-  }, []);
-
   const handleFirstToken = useCallback(() => {
-    // Stop thinking animation when first token arrives
-    setThinking(false);
+    // Keep the mascot/orb animation alive until the request completes.
   }, []);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
     
     setLoading(true);
-    setThinking(true);
     setError('');
     setResult('');
 
@@ -58,9 +51,6 @@ export default function StudioPage() {
         }),
       });
 
-      // Stop thinking animation
-      setThinking(false);
-
       const data = await response.json();
       
       if (data.success) {
@@ -68,8 +58,7 @@ export default function StudioPage() {
       } else {
         setError(data.error || 'Generation failed');
       }
-    } catch (err) {
-      setThinking(false);
+    } catch {
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);
@@ -149,10 +138,10 @@ export default function StudioPage() {
         </button>
 
         {/* // Thinking Animation */}
-        {(loading || thinking) && (
+        {loading && (
           <div style={{ marginTop: 24, display: 'flex', justifyContent: 'center' }}>
             <ThinkingAnimation
-              isActive={thinking}
+              isActive={loading}
               onFirstToken={handleFirstToken}
               width={250}
               height={100}
