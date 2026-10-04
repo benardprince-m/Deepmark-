@@ -1,41 +1,32 @@
-# DeepMark - Blockers & Issues Log
+# DeepMark — Current blockers and verification notes
 
-## Blocker 1: Supabase Tables Not Initialized - ACTION REQUIRED
-**Date:** 2026-08-04
-**Severity:** 🔴 HIGH - Blocks all database features
-**Impact:** Auth, storage, and all database operations unavailable
+This file records **repository-level** blockers only. It does not contain project URLs, API keys, tokens, or instructions to run untracked SQL against a live database.
 
-**Status:** ✅ Credentials provided, migration file ready, manual execution required
+## Current blockers
 
-**Steps to Complete:**
-1. Go to: https://supabase.com/dashboard/project/emhsbpbewhatkwlznanr/sql
-2. Copy contents of `supabase/migrations/MANUAL_MIGRATION.sql`
-3. Paste and run in SQL Editor
-4. Verify with: `curl -s "https://emhsbpbewhatkwlznanr.supabase.co/rest/v1/users" -H "apikey: sb_publishable_vA0E7xWnHZhmGAk_RmX2LQ_R3O4a6ak"`
+### Vercel build configuration
 
-## ✅ RESOLVED BLOCKERS
+The application compiles and type-checks, but Next.js route collection imports server modules that require `JWT_SECRET`. Vercel must define a strong production `JWT_SECRET` before `npm run build` can complete. Configure it in the Vercel project environment for the relevant deployment targets; never commit the value.
 
-### Rate Limiting Implemented
-**Date:** 2026-08-04
-- Login: 5 attempts/min per IP
-- Signup: 3 attempts/hr per IP
-- Refresh: 10 attempts/min per IP
+The production environment also needs the variables in `.env.example`, including Supabase, Stripe, `NEXT_PUBLIC_APP_URL`, and `OPENROUTER_API_KEY` when live AI generation is enabled.
 
-### Brand Compliance Fixed
-**Date:** 2026-08-04
-- All violet colors → black
-- Focus rings corrected
+### External-service verification
 
-### AI Provider System Built
-**Date:** 2026-08-04
-- Provider interface created
-- OpenRouter adapter (default)
-- Capability registry implemented
+The repository contains Supabase migrations 001–009, Stripe handlers, and AI provider adapters. Source presence does not prove that the live Supabase project has the migrations, policies, grants, Stripe webhooks, or provider keys configured. Verify those separately in the deployment environment before calling the product production-ready.
 
-### Environment Variables Configured
-**Date:** 2026-08-04
-- NEXT_PUBLIC_SUPABASE_URL ✅
-- NEXT_PUBLIC_SUPABASE_ANON_KEY ✅
-- SUPABASE_SERVICE_ROLE_KEY ✅
-- JWT_SECRET ✅
-- OPENROUTER_API_KEY ✅
+## Resolved repository blockers
+
+- The unsafe legacy migration route was removed from `src/app/api/v1/migrate/`.
+- The stale root mock dashboard was replaced by the DeepMark landing experience.
+- The old Pong thinking animation was replaced by the mascot/orb motion system.
+- Starter public SVG assets and confirmed orphaned UI components were removed during the repository cleanup pass.
+
+## Safe verification procedure
+
+1. Confirm the deployment environment has all required variables from `.env.example`.
+2. Run `npm ci`, `npx tsc --noEmit`, `npm run lint`, and `npm run build` on the commit being deployed.
+3. Confirm the Supabase project reports migrations 001–009 as applied and review RLS policies/grants for the current schema.
+4. Confirm Stripe webhook signing and return routes with test-mode events.
+5. Confirm the AI provider key and workspace usage limits with a non-production request.
+
+If a new blocker is found, record the date, exact environment, observed error, and verification command here without adding secrets.

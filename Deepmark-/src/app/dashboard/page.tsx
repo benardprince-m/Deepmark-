@@ -26,10 +26,6 @@ export default function DashboardPage() {
     }
   }, [isAuth, router]);
 
-  useEffect(() => {
-    setActiveNav(window.location.pathname);
-  }, []);
-
   const handleLogout = () => {
     logout();
     router.push('/auth/login');
@@ -143,7 +139,7 @@ export default function DashboardPage() {
         <header style={{height: 58, borderBottom: '1px solid #E8E8E8', display: 'flex', alignItems: 'center', padding: '0 28px', gap: 16, background: '#FFFFFF', position: 'sticky', top: 0, zIndex: 100}}>
           <div style={{flex: 1, fontSize: 15, fontWeight: 600}}>Dashboard</div>
           <div style={{display: 'flex', gap: 8, alignItems: 'center'}}>
-            <button style={{padding: '9px 18px', borderRadius: 6, fontSize: 13, fontWeight: 600, border: 'none', background: '#191919', color: 'white', cursor: 'pointer'}}>
+            <button onClick={() => handleNav('/dashboard/studio')} style={{padding: '9px 18px', borderRadius: 6, fontSize: 13, fontWeight: 600, border: 'none', background: '#191919', color: 'white', cursor: 'pointer'}}>
               + New Content
             </button>
           </div>
@@ -154,10 +150,10 @@ export default function DashboardPage() {
           {/* Stats */}
           <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28}}>
             {[
-              { label: 'Content Created', value: '0', change: '+0 this week' },
-              { label: 'Scheduled', value: '0', change: 'No upcoming' },
-              { label: 'Published', value: '0', change: '+0 this week' },
-              { label: 'Engagement', value: '0%', change: 'No data yet' },
+              { label: 'Content Created', value: '—', change: 'Analytics connection pending' },
+              { label: 'Scheduled', value: '—', change: 'Planner connection pending' },
+              { label: 'Published', value: '—', change: 'Publishing connection pending' },
+              { label: 'Engagement', value: '—', change: 'No verified data yet' },
             ].map((stat, i) => (
               <div key={i} style={{background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: 10, padding: 16}}>
                 <div style={{fontSize: 12, fontWeight: 600, color: '#858585', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6}}>{stat.label}</div>
@@ -169,8 +165,8 @@ export default function DashboardPage() {
 
           {/* Welcome Card */}
           <div style={{background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: 14, padding: 32}}>
-            <h2 style={{fontSize: 18, fontWeight: 700, marginBottom: 8}}>Welcome back, {user?.email?.split('@')[0] || 'Founder'}! 👋</h2>
-            <p style={{color: '#858585', marginBottom: 20}}>Ready to create some amazing content? Head to the Studio to generate your first piece of marketing content.</p>
+            <h2 style={{fontSize: 18, fontWeight: 700, marginBottom: 8}}>Welcome back, {user?.email?.split('@')[0] || 'Founder'}.</h2>
+            <p style={{color: '#858585', marginBottom: 20}}>Your workspace is ready. Create your first piece of content in Studio; performance metrics will appear once verified data is connected.</p>
             <button 
               onClick={() => handleNav('/dashboard/studio')}
               style={{padding: '10px 20px', borderRadius: 8, fontSize: 14, fontWeight: 600, border: 'none', background: '#191919', color: 'white', cursor: 'pointer'}}

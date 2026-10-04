@@ -1,7 +1,9 @@
 'use client';
+/* eslint-disable react/no-unescaped-entities -- globe insight copy is authored as readable text. */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import type { GlobeMethods } from 'react-globe.gl';
 
 // Dynamically import Globe to avoid SSR issues and reduce initial bundle
 const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
@@ -28,7 +30,7 @@ interface NodeData {
 }
 
 export default function MarketingGlobe() {
-  const globeRef = useRef<any>(null);
+  const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useState<NodeData[]>([]);
   const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);

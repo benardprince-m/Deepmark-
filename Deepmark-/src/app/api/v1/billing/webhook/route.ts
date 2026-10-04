@@ -8,6 +8,14 @@ export const dynamic = 'force-dynamic';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
+function getSubscriptionPeriod(subscription: Stripe.Subscription) {
+  const item = subscription.items.data[0];
+  return {
+    start: new Date((item?.current_period_start || Math.floor(Date.now() / 1000)) * 1000),
+    end: new Date((item?.current_period_end || Math.floor(Date.now() / 1000)) * 1000),
+  };
+}
+
 async function updateUserSubscription(
   userId: string,
   subscriptionId: string,
@@ -68,16 +76,15 @@ export async function POST(request: NextRequest) {
               .update({ stripe_customer_id: session.customer as string })
               .eq('id', userId);
 
-            const periodStart = new Date((subscription as any).current_period_start * 1000 || Date.now());
-            const periodEnd = new Date((subscription as any).current_period_end * 1000 || Date.now());
+            const period = getSubscriptionPeriod(subscription);
 
             await updateUserSubscription(
               userId,
               subscription.id,
               plan,
               subscription.status,
-              periodStart,
-              periodEnd
+              period.start,
+              period.end
             );
           }
         }
@@ -92,16 +99,15 @@ export async function POST(request: NextRequest) {
           const priceId = subscription.items.data[0]?.price?.id;
           const plan = getPlanFromPriceId(priceId || '');
           
-          const periodStart = new Date((subscription as any).current_period_start * 1000 || Date.now());
-          const periodEnd = new Date((subscription as any).current_period_end * 1000 || Date.now());
+          const period = getSubscriptionPeriod(subscription);
 
           await updateUserSubscription(
             userId,
             subscription.id,
             plan,
             subscription.status,
-            periodStart,
-            periodEnd
+            period.start,
+            period.end
           );
         }
         break;

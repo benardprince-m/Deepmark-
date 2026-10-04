@@ -44,6 +44,7 @@ function getHeatmapColor(value: number, max: number): string {
 export default function AnalyticsPage() {
   const [data, setData] = useState<HeatmapData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function fetchData() {
@@ -54,9 +55,11 @@ export default function AnalyticsPage() {
         const result = await response.json();
         if (result.success) {
           setData(result.data);
+        } else {
+          setError(result.error || 'Analytics are unavailable right now.');
         }
-      } catch (error) {
-        console.error('Failed to fetch velocity:', error);
+      } catch {
+        setError('Analytics are unavailable right now.');
       } finally {
         setLoading(false);
       }
@@ -72,21 +75,22 @@ export default function AnalyticsPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#F6F6F6', fontFamily: 'Inter, sans-serif' }}>
       <div style={{ padding: 28, maxWidth: 1180 }}>
-        <h1 style={{ fontSize: 20, fontWeight: 700, color: '#FFFFFF', marginBottom: 24 }}>Velocity Analytics</h1>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: '#191919', marginBottom: 24 }}>Velocity Analytics</h1>
+        {error && <div style={{ marginBottom: 20, border: '1px solid #FECACA', borderRadius: 10, padding: 14, background: '#FEF2F2', color: '#991B1B', fontSize: 13 }}>{error}</div>}
 
         {/* Summary Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 28 }}>
           <div style={{ background: '#191919', borderRadius: 10, padding: 20 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: '#858585', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Total Clicks</div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: '#FFFFFF' }}>{data?.summary.totalClicks || 0}</div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: '#FFFFFF' }}>{data ? data.summary.totalClicks : '—'}</div>
           </div>
           <div style={{ background: '#191919', borderRadius: 10, padding: 20 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: '#858585', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Total Signups</div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: '#22C55E' }}>{data?.summary.totalSignups || 0}</div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: '#22C55E' }}>{data ? data.summary.totalSignups : '—'}</div>
           </div>
           <div style={{ background: '#191919', borderRadius: 10, padding: 20 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: '#858585', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Avg Conversion</div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: '#FFFFFF' }}>{data?.summary.avgConversion.toFixed(1) || 0}%</div>
+            <div style={{ fontSize: 32, fontWeight: 700, color: '#FFFFFF' }}>{data ? `${data.summary.avgConversion.toFixed(1)}%` : '—'}</div>
           </div>
         </div>
 
@@ -140,7 +144,7 @@ export default function AnalyticsPage() {
         {/* Verified Leaderboard */}
         <div style={{ background: '#191919', borderRadius: 14, padding: 24, marginBottom: 24 }}>
           <h2 style={{ fontSize: 16, fontWeight: 700, color: '#22C55E', marginBottom: 20 }}>
-            ✓ Verified Variants (15%+ CVR)
+            ✓ Top-performing Variants (15%+ CVR)
           </h2>
           
           {loading ? (
@@ -192,7 +196,7 @@ export default function AnalyticsPage() {
           ) : (
             <div style={{ textAlign: 'center', padding: 40 }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>🎯</div>
-              <p style={{ color: '#858585', marginBottom: 16 }}>No verified variants yet. Reach 15%+ CVR to appear here.</p>
+              <p style={{ color: '#858585', marginBottom: 16 }}>No variants have reached the 15% conversion threshold yet.</p>
               <a href="/dashboard/studio" style={{ color: '#22C55E', fontWeight: 600 }}>Go to Studio →</a>
             </div>
           )}

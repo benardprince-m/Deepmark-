@@ -1,38 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import Link from 'next/link';
 
 export default function PlanPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">Marketing Plan</h1>
-        <p className="text-slate-600 mb-8">AI-generated marketing strategy for your startup</p>
-
-        <div className="grid gap-6">
-          <div className="p-6 border border-slate-200 rounded-xl">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">📋 Strategy Overview</h2>
-            <div className="space-y-4 text-slate-600">
-              <p>Your comprehensive marketing plan will appear here after generation.</p>
-              <p>Include: goals, target audience, channels, timeline, and metrics.</p>
-            </div>
-          </div>
-
-          <div className="p-6 border border-slate-200 rounded-xl">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">🎯 Goals</h2>
-            <ul className="list-disc list-inside space-y-2 text-slate-600">
-              <li>Define primary objective</li>
-              <li>Set measurable KPIs</li>
-              <li>Timeline milestones</li>
-            </ul>
-          </div>
-
-          <div className="p-6 border border-slate-200 rounded-xl">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">📅 Content Calendar</h2>
-            <p className="text-slate-600">Plan your content publishing schedule</p>
-          </div>
-        </div>
+    <main className="min-h-screen bg-white">
+      <div className="mx-auto max-w-4xl px-6 py-8">
+        <p className="text-xs font-semibold uppercase tracking-[.18em] text-slate-500">Workspace</p>
+        <h1 className="mt-2 text-2xl font-bold text-slate-900">Marketing Plan</h1>
+        <p className="mb-8 mt-2 text-slate-600">Your startup strategy will appear here after the planning flow is connected.</p>
+        <section className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
+          <h2 className="text-lg font-semibold text-slate-900">No plan has been generated</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">This route no longer shows generic goals as if they were your strategy. Add startup memory and use the Studio while plan generation is being connected.</p>
+          <Link href="/dashboard/studio" className="mt-6 inline-flex rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white">Open Studio</Link>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

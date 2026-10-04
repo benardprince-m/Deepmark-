@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 export const dynamic = 'force-dynamic';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getUserFromRequest } from '@/lib/jwt';
-import { successResponse, errorResponse, unauthorizedResponse, notFoundResponse, serverErrorResponse } from '@/lib/api-response';
+import { successResponse, unauthorizedResponse, notFoundResponse, serverErrorResponse } from '@/lib/api-response';
 import { SUBSCRIPTION_PLANS } from '@/lib/subscription';
 
 export async function GET(request: NextRequest) {

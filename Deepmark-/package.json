@@ -34,7 +34,6 @@
     "@types/uuid": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
-    "pg": "^8.22.0",
     "supabase": "^2.111.0",
     "tailwindcss": "^4",
     "typescript": "^5"

@@ -1,137 +1,316 @@
 # DeepMark
 
-DeepMark is an AI-powered startup marketing and growth intelligence system, built for early-stage founders. It is not a content generator bolted onto a scheduler. It is a system designed to understand a specific startup — its positioning, audience, market, and what actually works — and to become a more capable operating partner over time.
+> **Marketing execution intelligence for founders.**
+>
+> DeepMark gives a startup a working memory for its business, then turns that memory into clearer plans, differentiated content, and measurable execution.
 
-The final slogan is deliberately not locked. Do not invent or hard-code one anywhere.
+[![CI](https://github.com/benardprince-m/Deepmark-/actions/workflows/ci.yml/badge.svg)](https://github.com/benardprince-m/Deepmark-/actions/workflows/ci.yml)
 
-## What DeepMark is
+DeepMark is an early-stage product in active development. This repository contains the Next.js application under [`Deepmark-/`](Deepmark-/), database migrations, deployment configuration, and the evidence trail used by future agents. Some flows are implemented in source, while others are intentionally marked unavailable until their data, integrations, or persistence paths are real.
 
-- A research-informed strategy system for startup marketing
-- A persistent, workspace-isolated memory of each startup (the Memory Brain)
-- A trend intelligence surface (the Globe) backed by real data
-- An orchestration system coordinating research, memory, reasoning, generation, review, scheduling, and analytics
-- A product that reveals its activity through a "thinking" surface with the signature DeepMark `//` animation
+This root README is the **canonical GitHub onboarding document**. Read it before changing the app. Then read [`Deepmark-/AGENTS.md`](Deepmark-/AGENTS.md) for Next.js-specific rules and [`AGENT_LOG.md`](AGENT_LOG.md) for the history of previous agent sessions.
 
-## What DeepMark is not
+---
+
+## 1. What DeepMark is
+
+Startup marketing systems often lose the connection between founder context, the content created, and the results measured. DeepMark is intended to close that loop with workspace-isolated startup memory, planning, AI-assisted content creation, and evidence-based analytics.
+
+```mermaid
+flowchart LR
+    Founder[Founder context] --> Memory[Startup memory]
+    Memory --> Plan[Plan the next move]
+    Plan --> Create[Create content and campaigns]
+    Create --> Publish[Schedule or publish]
+    Publish --> Measure[Measure performance]
+    Measure --> Memory
+```
+
+The product should feel less like a generic AI text box and more like a calm, memory-aware marketing partner. The current interface follows that direction: the original DeepMark mascot represents identity and presence, while a restrained orb layer represents active reasoning.
+
+### What DeepMark is not
 
 - A generic ChatGPT wrapper
-- A generic content writer
 - A dashboard full of vanity metrics
-- A social media scheduler with AI sprinkled on top
 - A decorative AI interface
+- A social scheduler with unverified analytics
 - A competitor-copying machine
-- A black-box system with no useful user-facing context
-- A product whose best intelligence is locked behind pricing
-- An over-engineered infrastructure project with no product value
+- A product that presents demo data as a user's real data
 
-## Core intelligence engine
+---
 
+## 2. Current state: observed versus intended
+
+| Area | Current state | Source of truth |
+| --- | --- | --- |
+| Landing | Implemented with a seven-second mascot/orb intro, skip control, reduced-motion support, and cursor-aware mascot | `Deepmark-/src/app/page.tsx`, `Deepmark-/src/components/motion/` |
+| Dashboard | Authenticated workspace shell with dashboard, Studio, Chat, Planner, Plan, Analytics, and Settings routes | `Deepmark-/src/app/dashboard/` |
+| Studio | Content type selection and AI generation request path are implemented | `Deepmark-/src/app/dashboard/studio/page.tsx`, `Deepmark-/src/app/api/v1/studio/` |
+| Thinking states | Pong loader replaced by mascot-to-orb searching, reasoning, solving, and complete states | `Deepmark-/src/components/thinking/ThinkingAnimation.tsx` |
+| Chat | Welcome/listening preview only; submission is intentionally disabled until a real chat API exists | `Deepmark-/src/app/dashboard/chat/page.tsx` |
+| Planner and Plan | Honest empty/not-generated states; no fabricated upcoming posts or generic strategy goals | `Deepmark-/src/app/dashboard/planner/`, `Deepmark-/src/app/dashboard/plan/` |
+| Settings | Read-only status surface until server-backed persistence is implemented | `Deepmark-/src/app/dashboard/settings/page.tsx` |
+| Analytics | Reads velocity API data when available and shows a distinct error state; derived thresholds are not called independently verified | `Deepmark-/src/app/dashboard/analytics/page.tsx` |
+| Authentication | JWT and cookie-based API/session flow exists; verification, recovery, and production email delivery still require runtime verification | `Deepmark-/src/app/api/v1/auth/`, `Deepmark-/src/lib/` |
+| Database | Supabase migrations 001–009 are checked in; live migration state, grants, RLS, and RPC exposure must be verified in the deployed project | `Deepmark-/supabase/migrations/` |
+| AI | Provider registry, OpenRouter adapter, retry, quota, and memory code exist; production usage enforcement is still being hardened | `Deepmark-/src/lib/ai/` |
+| Billing | Stripe handlers exist, but pricing CTAs remain disabled until workspace ownership, entitlements, callbacks, and runtime configuration are verified | `Deepmark-/src/app/api/v1/billing/`, `Deepmark-/src/app/(marketing)/pricing/` |
+
+> A route, component, migration, or green commit is not proof that a feature works in production. Runtime evidence wins.
+
+---
+
+## 3. Architecture
+
+```mermaid
+flowchart LR
+  User[Founder] --> Web[Next.js App Router]
+  Web --> Landing[Landing + Motion System]
+  Web --> Workspace[Dashboard Workspace]
+  Web --> Studio[Content Studio]
+  Web --> Chat[Chat Preview]
+  Web --> API[API Routes /api/v1]
+  API --> Auth[JWT + httpOnly Cookies]
+  API --> AI[AI Provider Router]
+  API --> Data[Supabase PostgreSQL]
+  API --> Billing[Stripe Billing]
+  API --> Obs[Observability + Usage]
+  Data --> Memory[Startup Memory]
+  Data --> Content[Campaigns, Tasks, Content]
+  AI --> Output[Drafts + Recommendations]
+  Memory --> AI
+  Output --> Content
 ```
-Validation -> Memory -> Research -> Strategy -> Generation -> Review
--> Scheduling -> Analytics -> Memory Update -> (next decision)
+
+![DeepMark architecture](Deepmark-/docs/diagrams/rendered/architecture.png)
+
+Editable source: [`Deepmark-/docs/diagrams/architecture.mmd`](Deepmark-/docs/diagrams/architecture.mmd).
+
+### Runtime request path
+
+```text
+Browser
+  -> Next.js page or client component
+  -> /api/v1 route handler
+  -> auth / rate-limit / validation
+  -> domain library or provider adapter
+  -> Supabase, Stripe, or AI provider
+  -> normalized API response
+  -> UI state and motion state
 ```
 
-The loop is closed: performance data feeds memory, memory informs strategy, strategy informs generation.
+Keep this boundary clear. Do not call Supabase service-role operations from a client component, do not expose secrets through `NEXT_PUBLIC_*`, and do not add a second auth mechanism without documenting the migration path.
 
-## Moats
+---
 
-1. **Orchestration** — coordinating research, memory, reasoning, generation, tools, integrations, and feedback rather than treating an LLM call as the product.
-2. **Understanding** — an increasingly detailed model of the startup, founder, positioning, audience, market, content history, and performance.
-3. **Prompt Engine** — dynamically constructed, context-aware instructions rather than static prompts.
-4. **Memory** — persistent startup-specific knowledge that compounds in value over time.
-5. **Research** — DeepMark initially learns from evidence instead of pretending it already knows what will work.
-6. **Feedback** — performance influences future strategy and memory.
+## 4. Repository map
 
-## Beta-defining surfaces
+```text
+Deepmark-/
+├── AGENT_LOG.md                         # Required session history at repo root
+├── Deepmark-/                            # Next.js application directory
+│   ├── src/app/                          # Public pages, auth, dashboard, API routes
+│   ├── src/components/                  # UI, memory, motion, AI components
+│   ├── src/lib/                          # Auth, AI, Supabase, Stripe, observability
+│   ├── src/types/                        # API and database types
+│   ├── supabase/migrations/              # Ordered SQL migrations 001–009
+│   ├── docs/diagrams/                    # Editable Mermaid + rendered PNGs
+│   ├── .env.example                      # Environment variable contract
+│   ├── AGENTS.md                         # Next.js agent rules
+│   ├── package.json                       # Scripts and dependencies
+│   └── .github/workflows/ci.yml          # CI/deploy workflow, if present in app tree
+├── README.md                             # This canonical onboarding document
+└── repo-audit-report.md                  # Latest static audit synthesis
+```
 
-Two surfaces are mandatory for beta — they are not "future someday" features:
+Useful product routes:
 
-- **Memory Brain** — an interactive memory graph with foundational nodes (existing before they are populated), dynamically generated nodes, relationships between concepts, selectable node -> zoom/focus -> memory-card drawer, workspace-isolated. No cross-workspace contamination, ever.
-- **Globe** — an interactive intelligence globe for geographic trend discovery: region -> videos / sounds / campaigns / topics, backed by real trend data. A spinning Earth without intelligence behind it is not a feature.
+- `/` — landing intro and mascot hero
+- `/auth/login` — login surface
+- `/auth/signup` — signup surface
+- `/dashboard` — authenticated workspace shell
+- `/dashboard/studio` — content Studio and reasoning animation
+- `/dashboard/chat` — mascot welcome preview
+- `/dashboard/planner` — honest planner empty state
+- `/dashboard/analytics` — velocity analytics when data is available
+- `/pricing` — pricing information with billing CTAs disabled until verified
 
-The thinking surface with the Pong-inspired `//` animation (gravity/eased physics, stops at first token, glow intensifies with depth) is part of the locked experience.
+---
 
-## Design system (locked)
+## 5. Local development
 
-- Monochrome foundation: `#0D0D0D`, `#0A0A0A`, `#111111`; surfaces `#121212`, `#171717`; borders `#262626`
-- Functional green `#22C55E`: success, positive deltas, successful state
-- Functional red `#EF4444`: failure, destructive action, negative delta
-- Blue `#3B82F6`: reserved for the memory/neural intelligence signal
-- Zero purple. Zero emojis. Color is functional, never decorative chrome.
-- Typography: Inter / Geist family — high density, tight hierarchy, editorial-technical feel
-- Icons: Lucide. Restrained radius, subtle elevation, strong alignment.
-- The double-slash `//` is the brand mark.
-- Reference collages (1131-1134) are the visual north star; the currently deployed UI is not considered finished.
+### Prerequisites
 
-## Beta roadmap (locked, Phase 0-6)
+- Node.js 20 or newer
+- npm
+- Supabase project for database-backed routes
+- Stripe test credentials when exercising billing routes
+- OpenRouter or another configured provider when exercising live generation
 
-0. **Stabilize** — deployment, routes, auth, sessions, RLS, authorization, DB integrity, API errors, production config, real analytics, remove fake/placeholder data. *(Currently active phase.)*
-1. **Core Reliability** — generation reliability, timeouts, retries, provider failures, loading/error states, async execution, observability, logging, critical tests.
-2. **Beta-Defining Intelligence Surfaces** — Memory Brain (vault, foundational + dynamic nodes, relationships, memory cards, graph, persistence, selection/focus) and Globe (3D, DeepMark treatment, location interaction, niche trend discovery, real trend data, content/campaign/sound signals).
-3. **Experience Lock** — thinking surface, `//` animation, loading/empty/error states, navigation, memory and globe transitions, accessibility, responsive behavior, visual consistency.
-4. **Connectivity** — only beta-required integrations.
-5. **Commercial** — Stripe validation, pricing, entitlements, usage/session model, billing, legal, admin, support.
-6. **Beta Gate** — Security, then Reliability/Performance, then UX/Accessibility, then a production smoke test (fresh user, auth, second-workspace isolation, generation, memory persistence, globe data). The Orchestrator makes the final decision based on evidence.
+### Install
 
-## Infrastructure stance (locked Oct 4, 2026)
+```bash
+git clone https://github.com/benardprince-m/Deepmark-.git
+cd Deepmark-/Deepmark-
+npm ci
+cp .env.example .env.local
+```
 
-The project is bootstrapped. Until there is revenue:
+The application requires these values for a complete environment:
 
-- No paid hosting platforms (Railway etc.) and no managed database services (Supabase Pro etc.) for now.
-- Develop against environment variables and free sandboxes/tiers.
-- Deployment and infrastructure decisions are deferred to Phase 5 (Commercial), not Phase 0.
-- The codebase keeps the Supabase client architecture; the cost stance is about where things run, not about ripping out code.
+```dotenv
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+JWT_SECRET=use-a-long-random-secret
+OPENROUTER_API_KEY=your-openrouter-api-key
 
-## Non-negotiables
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_STARTER_PRICE_ID=price_...
+STRIPE_PRO_PRICE_ID=price_...
+STRIPE_ENTERPRISE_PRICE_ID=price_...
 
-- Workspace isolation: every data query is workspace-scoped. No cross-workspace data leakage, ever.
-- No `USING (true)` RLS bypass policies. The only intentional public-read policy is `global_trend_nodes` (for the Globe), documented in `supabase/migrations/006_fix_rls_bypass.sql`.
-- Real data only: no fake analytics or placeholder numbers in production surfaces. (Known Phase 0 debt: hardcoded dashboard values in `src/app/page.tsx` — `$23,902` / `16,815` — must be replaced with real data before beta.)
-- Model-agnostic AI layer.
-- Evidence standard: every important engineering claim is classified **Observed** (directly confirmed), **Inferred** (strongly suggested, not directly confirmed), or **Unknown** (requires investigation). A green commit is not proof that a feature works.
-- Never trust a document claiming "complete" — runtime evidence wins.
+NEXT_PUBLIC_APP_NAME=DeepMark
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NODE_ENV=development
+```
 
-## Commit policy
+`JWT_SECRET` is required during server module initialization. This is the direct reason a Vercel deployment without that variable fails while collecting data for `/api/v1/ai/provider`. Add it in Vercel under the correct Production/Preview environment; never commit the value.
 
-One commit per completed, confirmed task or step — keeping related changes coupled within the same commit when they must ship together. Commit messages use conventional prefixes (`fix:`, `docs:`, `feat:`, `chore:`).
+Run the app:
 
-## Repository map
+```bash
+npm run dev
+```
 
-- The Next.js application lives in the nested `Deepmark-/` directory (i.e. `Deepmark-/Deepmark-/` from the repo root).
-- Database migrations live in `Deepmark-/supabase/migrations/`.
-- `main` is the only branch. Old experiment branches were deliberately deleted; do not resurrect them (notably the abandoned light-mode/green-`#28C76F` experiment).
-- Known historical defect: an Aug 24-25 bulk-replace corrupted string literals. The migrate route URL was the confirmed instance; treat other strings touched by those commits with suspicion.
+Open [http://localhost:3000](http://localhost:3000).
 
-## System architecture — the 12 layers of DeepMark
+### Database setup
 
-1. **Frontend** — the Next.js App Router UI: the pages (Dashboard, Scheduler/Calendar, Studio, Globe, Chat, Memory, Settings) rendered in the locked design system.
-2. **API** — the `/api/v1` routes: request validation, response envelopes, error handling. The only way in and out.
-3. **Backend / execution engine** — server-side orchestration: task execution, async jobs, retries, scheduling.
-4. **Auth & sessions** — signup, email verification, password reset, httpOnly cookies, JWT sessions.
-5. **Database** — Postgres on the Supabase architecture: core tables, migrations in `supabase/migrations/`.
-6. **Security & isolation** — RLS with workspace isolation (no `USING (true)`), secret/token handling, rate limits.
-7. **Memory (Brain)** — the Memory Brain: memory engine, persistence, foundational + dynamic nodes, the memory graph.
-8. **Intelligence & reasoning** — the orchestrator, prompt engine, AI reasoning layer, model-agnostic provider switching.
-9. **Research & trends** — trend detection, Globe data, regional adoption, signal filtering.
-10. **Content pipeline** — generation, review, sanitizing, scheduling, publishing.
-11. **Analytics & feedback** — real analytics only, engagement mapping, weekly optimization, the learning loop back into memory.
-12. **Integrations** — social connects, plugins, MCP. Post-launch scope (Phase 4+).
+Apply migrations 001–009 in order using the Supabase CLI or dashboard. Do not create or run an ad-hoc migration route in the application. Schema changes belong in `Deepmark-/supabase/migrations/` and should be applied through a forward migration after review of tenant isolation and RLS.
 
-## Agent protocol (read this before working on the repo)
+---
 
-If you are an AI agent (OpenHands, Vibe, Claude, or any other) starting work on this repository:
+## 6. Validation
 
-1. **Read this README fully.** It is the canonical onboarding document.
-2. **Register yourself and log your work in `AGENT_LOG.md`** at the repo root: who you are, what you did, when, and whether each action was inside or outside the roadmap above. Do this at the end of every session — not after every change.
-3. **Follow the evidence standard** (Observed / Inferred / Unknown). Never claim a feature works without runtime evidence.
-4. **Authority hierarchy**, in descending order: (a) Benard's latest explicit decision in conversation, (b) the approved DeepMark Master Document, (c) the State of Union (engineering reality), (d) Specification / Operating System docs (implementation detail), (e) older prompts and pitches. If an older document conflicts, the newer authority wins.
-5. **Never resurrect superseded decisions** (old pricing tiers, 7-step campaign flow, light-mode experiments, etc.) without asking the orchestrator first.
-6. **Respect the non-negotiables** above — workspace isolation and no RLS bypass are constitutional.
-7. The canonical development workflow is **Builder -> Reviewer -> Verifier -> Orchestrator**: one agent builds, another tries to break it, a third verifies it works, and the orchestrator decides based on evidence. No agent should automatically trust another agent.
-8. When uncertain, investigate. When implemented, verify. When verified, document. When valuable, preserve it in memory.
+From `Deepmark-/`:
 
-## Document status
+```bash
+npm ci
+npx tsc --noEmit
+npm run lint
+npm run build
+```
 
-Locked: intelligence loop, memory/globe as beta-defining surfaces, thinking experience, visual system, evidence-based engineering, phased roadmap, bootstrapping infrastructure stance.
+For a focused motion/UI change:
 
-Not locked (do not finalize without Benard): final slogan, exact pricing, usage/session economics, commercial entitlements, research and trend-data providers, prompt-compression technique, final integration scope, final infrastructure choices, accessibility certification requirements.
+```bash
+npx eslint src/components/motion src/components/thinking src/app/page.tsx
+```
+
+The GitHub Actions workflow runs lint, typecheck, build, and Railway deployment on `main` when its required secrets are present. If deploying to Vercel instead, configure the same application variables in the Vercel project settings, especially `JWT_SECRET`, Supabase keys, `NEXT_PUBLIC_APP_URL`, and provider/billing secrets for the routes being exercised.
+
+---
+
+## 7. API surface
+
+The application API is versioned under `/api/v1`. The current route groups are:
+
+| Group | Purpose |
+| --- | --- |
+| `/auth/*` | Signup, login, logout, session, refresh, verification, and password reset handlers |
+| `/workspaces/*` | Workspace lifecycle and scope |
+| `/startups/*` | Startup records and context |
+| `/memory/*` | Workspace memory records |
+| `/campaigns/*` | Campaigns and execution objects |
+| `/content/*` | Content records and analytics relationships |
+| `/tasks/*` | Execution tasks |
+| `/trends/*` | Global and velocity trend data |
+| `/analytics/*` | Startup analytics and sync operations |
+| `/studio/*` | AI-assisted generation and enhancement handlers |
+| `/integrations/*` | External integration records; verify methods against route files |
+| `/notifications` | Notification data |
+| `/subscription/*` and `/billing/*` | Usage, subscription, checkout, portal, and webhook handlers |
+| `/health` | Health check |
+
+Route names do not define auth requirements or behavior. Inspect the actual `route.ts`, its validation, ownership checks, error handling, and database queries before relying on it.
+
+---
+
+## 8. Motion system
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Welcome: open landing or chat
+    Welcome --> Listening: user focuses input
+    Listening --> Searching: request starts
+    Searching --> Reasoning: context is gathered
+    Reasoning --> Solving: answer takes shape
+    Solving --> Complete: response ready
+    Complete --> Idle
+    Searching --> Error: request fails
+    Reasoning --> Error: provider or network failure
+    Error --> Idle
+```
+
+The mascot is DeepMark's identity. The orb layer is a reasoning signal that emerges around it and resolves back into it. Motion honors `prefers-reduced-motion`; future heavier particle work should pause when hidden or offscreen.
+
+---
+
+## 9. Agent protocol
+
+```mermaid
+flowchart TD
+  Start[New agent] --> Read[Read root README]
+  Read --> Rules[Read Deepmark-/AGENTS.md + AGENT_LOG.md]
+  Rules --> Truth[Check source, migrations, git status, and audit report]
+  Truth --> Scope[Choose one scoped change]
+  Scope --> Build[Implement with existing patterns]
+  Build --> Validate[Lint, typecheck, build, and targeted checks]
+  Validate --> Log[Append one session entry to AGENT_LOG.md]
+  Log --> Commit[Focused conventional commit]
+  Commit --> Push[Push only when requested]
+```
+
+![DeepMark product and agent flow](Deepmark-/docs/diagrams/rendered/product-and-agent-flow.png)
+
+Editable source: [`Deepmark-/docs/diagrams/product-and-agent-flow.mmd`](Deepmark-/docs/diagrams/product-and-agent-flow.mmd).
+
+Required reading order:
+
+1. This root README.
+2. [`Deepmark-/AGENTS.md`](Deepmark-/AGENTS.md).
+3. [`AGENT_LOG.md`](AGENT_LOG.md).
+4. [`repo-audit-report.md`](repo-audit-report.md).
+5. The target route/component and any related migration.
+
+Non-negotiables:
+
+- Workspace isolation and tenant ownership are mandatory.
+- Never reintroduce permissive RLS bypasses.
+- Do not present fabricated analytics, hardcoded schedules, or simulated saves as real behavior.
+- Do not expose service-role, JWT, Stripe, or provider secrets to the browser.
+- Classify claims as Observed, Inferred, or Unknown.
+- Preserve migration history; use forward corrective migrations.
+- Log one concise entry per agent session.
+
+---
+
+## 10. Roadmap orientation
+
+1. **Stabilize** — remove stale paths, unsafe behavior, misleading mock surfaces, and deployment blockers.
+2. **Core reliability** — generation failures, retries, timeouts, quota enforcement, error states, and observability.
+3. **Beta intelligence surfaces** — real Memory Brain and real Globe/trend data.
+4. **Experience lock** — navigation, motion, accessibility, responsive behavior, and visual consistency.
+5. **Connectivity and commercial** — only verified integrations, billing, entitlements, legal, and support.
+6. **Beta gate** — security, reliability, UX/accessibility, and a production smoke test.
+
+The latest static audit is available at [`repo-audit-report.md`](repo-audit-report.md). It is evidence from repository inspection, not proof of live Supabase, Stripe, email, or Vercel configuration.
+
+---
+
+## License
+
+MIT

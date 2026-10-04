@@ -32,3 +32,8 @@ Format:
 - Action: Rewrote `Deepmark-/README.md` as the canonical human-and-agent onboarding document; added product context, current-state truth table, architecture/request-path documentation, repository map, environment/setup instructions, API surface, motion-system state model, roadmap, deployment guidance, and agent workflow guidance. Added editable Mermaid diagrams and rendered PNGs under `Deepmark-/docs/diagrams/`.
 - Roadmap alignment: Inside roadmap — Phase 0 documentation/stabilization and Phase 1 contributor orientation.
 - Evidence: Observed — README reviewed locally; `git diff --check` passed; both Mermaid sources rendered successfully to PNG; README contains four Mermaid diagrams and embedded architecture/agent-flow images.
+
+## 2026-10-04 — Manus
+- Action: Completed the repository cleanup pass: removed confirmed orphaned assets/components/dependency and an unregistered route; replaced fabricated dashboard, planner, plan, settings, chat, pricing, and analytics states; fixed metadata, environment documentation, legal-copy lint, Stripe/Globe types; and moved the canonical refined README to the GitHub-visible root with diagram links.
+- Roadmap alignment: Inside roadmap — Phase 0 Stabilize, with direct support for Phase 1 Core Reliability and Phase 3 Experience Lock.
+- Evidence: Observed — `npm run lint`, `npx tsc --noEmit`, and `npm run build` all passed using non-production placeholder build variables. Remaining P0/P1 security and live-service findings are explicitly preserved in `repo-audit-report.md` and were not claimed as fixed.

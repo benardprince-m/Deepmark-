@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unescaped-entities -- legal copy is authored as readable text. */
+
 export default function TermsPage() {
   return (
     <article className="prose prose-invert max-w-none">

@@ -1,24 +1,9 @@
 'use client';
+/* eslint-disable react/no-unescaped-entities -- marketing copy is authored as readable text. */
 
-import { SUBSCRIPTION_PLANS, type SubscriptionTier } from '@/lib/subscription';
-import { useState } from 'react';
+import { SUBSCRIPTION_PLANS } from '@/lib/subscription';
 
 export default function PricingPage() {
-  const [loading, setLoading] = useState<string | null>(null);
-
-  const handleSubscribe = async (priceId: string) => {
-    if (!priceId) return;
-    
-    setLoading(priceId);
-    
-    // In production, this would call Stripe checkout
-    // For now, simulate upgrade
-    setTimeout(() => {
-      alert(`In production, this would redirect to Stripe checkout for ${priceId}`);
-      setLoading(null);
-    }, 1000);
-  };
-
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -78,16 +63,14 @@ export default function PricingPage() {
               </ul>
 
               <button
-                onClick={() => handleSubscribe(plan.priceId)}
-                disabled={loading !== null || plan.price === 0}
+                disabled={plan.price !== 0}
                 className={`w-full py-3 rounded-xl font-medium transition-colors ${
                   plan.recommended
                     ? 'bg-black text-white hover:bg-slate-800'
                     : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {loading === plan.priceId ? 'Processing...' : 
-                 plan.price === 0 ? 'Current Plan' : `Get Started`}
+                {plan.price === 0 ? 'Current Plan' : 'Billing setup required'}
               </button>
             </div>
           ))}
@@ -100,7 +83,7 @@ export default function PricingPage() {
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div>
               <h3 className="font-semibold text-slate-900 mb-2">Can I change plans later?</h3>
-              <p className="text-slate-600 text-sm">Yes! You can upgrade or downgrade at any time. Changes take effect immediately.</p>
+              <p className="text-slate-600 text-sm">Plan changes will be available after workspace billing and entitlement checks are connected.</p>
             </div>
             <div>
               <h3 className="font-semibold text-slate-900 mb-2">What counts as a "generation"?</h3>
@@ -112,7 +95,7 @@ export default function PricingPage() {
             </div>
             <div>
               <h3 className="font-semibold text-slate-900 mb-2">What about AI API costs?</h3>
-              <p className="text-slate-600 text-sm">Included in all plans. We cover the OpenRouter API costs.</p>
+              <p className="text-slate-600 text-sm">AI usage limits and provider billing are still being connected to workspace entitlements.</p>
             </div>
           </div>
         </div>
@@ -120,10 +103,7 @@ export default function PricingPage() {
         {/* CTA */}
         <div className="mt-16 text-center p-8 bg-slate-50 rounded-2xl">
           <h3 className="text-xl font-semibold text-slate-900 mb-2">Need a custom plan?</h3>
-          <p className="text-slate-600 mb-4">For teams with special requirements, contact us for Enterprise pricing.</p>
-          <button className="px-6 py-2 border-2 border-slate-300 rounded-xl font-medium text-slate-700 hover:border-slate-400 transition-colors">
-            Contact Sales
-          </button>
+          <p className="text-slate-600 mb-4">Enterprise onboarding is not connected yet. We will add a verified contact path before enabling this CTA.</p>
         </div>
       </div>
     </div>
