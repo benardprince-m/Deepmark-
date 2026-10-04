@@ -8,7 +8,7 @@ This file records **repository-level** blockers only. It does not contain projec
 
 The application compiles and type-checks, but Next.js route collection imports server modules that require `JWT_SECRET`. Vercel must define a strong production `JWT_SECRET` before `npm run build` can complete. Configure it in the Vercel project environment for the relevant deployment targets; never commit the value.
 
-The production environment also needs the variables in `.env.example`, including Supabase, Stripe, `NEXT_PUBLIC_APP_URL`, and `OPENROUTER_API_KEY` when live AI generation is enabled.
+The production environment also needs the variables in `.env.example`, including Supabase, Stripe, and `NEXT_PUBLIC_APP_URL`. AI generation is intentionally unconfigured in the current deployment.
 
 ### External-service verification
 
@@ -27,6 +27,6 @@ The repository contains Supabase migrations 001–009, Stripe handlers, and AI p
 2. Run `npm ci`, `npx tsc --noEmit`, `npm run lint`, and `npm run build` on the commit being deployed.
 3. Confirm the Supabase project reports migrations 001–009 as applied and review RLS policies/grants for the current schema.
 4. Confirm Stripe webhook signing and return routes with test-mode events.
-5. Confirm the AI provider key and workspace usage limits with a non-production request.
+5. Treat AI generation as unavailable until a provider is deliberately selected and configured.
 
 If a new blocker is found, record the date, exact environment, observed error, and verification command here without adding secrets.

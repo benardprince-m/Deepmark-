@@ -53,7 +53,7 @@ The product should feel less like a generic AI text box and more like a calm, me
 | Analytics | Reads velocity API data when available and shows a distinct error state; derived thresholds are not called independently verified | `Deepmark-/src/app/dashboard/analytics/page.tsx` |
 | Authentication | JWT and cookie-based API/session flow exists; verification, recovery, and production email delivery still require runtime verification | `Deepmark-/src/app/api/v1/auth/`, `Deepmark-/src/lib/` |
 | Database | Supabase migrations 001–009 are checked in; live migration state, grants, RLS, and RPC exposure must be verified in the deployed project | `Deepmark-/supabase/migrations/` |
-| AI | Provider registry, OpenRouter adapter, retry, quota, and memory code exist; production usage enforcement is still being hardened | `Deepmark-/src/lib/ai/` |
+| AI | Provider code exists but is intentionally unconfigured in this deployment; live generation is not claimed as available | `Deepmark-/src/lib/ai/` |
 | Billing | Stripe handlers exist, but pricing CTAs remain disabled until workspace ownership, entitlements, callbacks, and runtime configuration are verified | `Deepmark-/src/app/api/v1/billing/`, `Deepmark-/src/app/(marketing)/pricing/` |
 
 > A route, component, migration, or green commit is not proof that a feature works in production. Runtime evidence wins.
@@ -145,7 +145,7 @@ Useful product routes:
 - npm
 - Supabase project for database-backed routes
 - Stripe test credentials when exercising billing routes
-- OpenRouter or another configured provider when exercising live generation
+- A configured AI provider when exercising live generation; this deployment intentionally has none configured
 
 ### Install
 
@@ -163,7 +163,6 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 JWT_SECRET=use-a-long-random-secret
-OPENROUTER_API_KEY=your-openrouter-api-key
 
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
@@ -176,7 +175,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 NODE_ENV=development
 ```
 
-`JWT_SECRET` is required during server module initialization. This is the direct reason a Vercel deployment without that variable fails while collecting data for `/api/v1/ai/provider`. Add it in Vercel under the correct Production/Preview environment; never commit the value.
+`JWT_SECRET` is required during server module initialization. This is the direct reason a Vercel deployment without that variable fails while collecting data for `/api/v1/ai/provider`. Add it in Vercel under the correct Production/Preview environment; never commit the value. No AI provider key is configured in the current deployment.
 
 Run the app:
 
