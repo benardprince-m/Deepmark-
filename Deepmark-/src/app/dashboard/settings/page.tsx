@@ -1,28 +1,7 @@
 'use client';
-
 import { getUser } from '@/lib/auth';
-
+import { ShieldCheck, UserRound } from 'lucide-react';
 export default function SettingsPage() {
   const user = getUser();
-
-  return (
-    <main className="min-h-screen bg-white">
-      <div className="mx-auto max-w-3xl px-6 py-8">
-        <p className="text-xs font-semibold uppercase tracking-[.18em] text-slate-500">Workspace</p>
-        <h1 className="mt-2 text-2xl font-bold text-slate-900">Settings</h1>
-        <p className="mb-8 mt-2 text-slate-600">Account and workspace persistence is not connected in this version.</p>
-        <div className="space-y-5">
-          <section className="rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900">Account</h2>
-            <label className="mt-5 block text-sm font-medium text-slate-700" htmlFor="email">Email</label>
-            <input id="email" type="email" value={user?.email || 'Unavailable'} disabled className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-slate-600" readOnly />
-          </section>
-          <section className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6">
-            <h2 className="text-lg font-semibold text-slate-900">Workspace settings</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">Workspace naming, branding, API-key management, and admin controls are intentionally unavailable until their server-backed save paths are implemented. No pretend “Saved” state is shown.</p>
-          </section>
-        </div>
-      </div>
-    </main>
-  );
+  return <div className="dm-route-page"><div className="dm-page-title-row"><div><span className="dm-eyebrow">Workspace</span><h1>Settings</h1><p>Account, workspace identity, and connection controls.</p></div></div><div className="dm-settings-grid"><section className="dm-route-card"><div className="dm-section-title"><span className="dm-route-empty-icon small"><UserRound size={19} /></span><div><h2>Account</h2><p>Signed-in account details</p></div></div><label className="dm-field-label" htmlFor="email">Email</label><input id="email" className="dm-field" type="email" value={user?.email || 'Unavailable'} disabled readOnly /><div className="dm-route-note" style={{ marginTop: 18 }}>Account credentials are managed through the authenticated DeepMark session.</div></section><section className="dm-route-card"><div className="dm-section-title"><span className="dm-route-empty-icon small"><ShieldCheck size={19} /></span><div><h2>Workspace controls</h2><p>Safe, server-backed configuration</p></div></div><div className="dm-route-note" style={{ marginTop: 18 }}>Workspace naming, branding, API-key management, and admin controls will appear here once their server-backed save paths are enabled. No pretend “Saved” state is shown.</div></section></div></div>;
 }

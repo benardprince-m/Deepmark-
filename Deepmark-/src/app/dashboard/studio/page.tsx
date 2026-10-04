@@ -1,185 +1,19 @@
 'use client';
-
 import { useState, useCallback } from 'react';
-// Using httpOnly cookies - token sent automatically
+import { ArrowRight, Check, Copy, FileText, Layers3, MessageSquare, Sparkles, Video } from 'lucide-react';
 import ThinkingAnimation from '@/components/thinking/ThinkingAnimation';
-
 const contentTypes = [
-  { id: 'post', label: 'LinkedIn Post', icon: '//', description: 'Engaging LinkedIn content' },
-  { id: 'carousel', label: 'Carousel', icon: '[]', description: 'Multi-slide content' },
-  { id: 'thread', label: 'X Thread', icon: '>>', description: 'Thread format for X' },
-  { id: 'video', label: 'Video Script', icon: '()', description: 'Short video content' },
+  { id: 'post', label: 'LinkedIn Post', icon: FileText, description: 'A clear founder-led post' },
+  { id: 'carousel', label: 'Carousel', icon: Layers3, description: 'A structured multi-slide idea' },
+  { id: 'thread', label: 'X Thread', icon: MessageSquare, description: 'A sequence with momentum' },
+  { id: 'video', label: 'Video Script', icon: Video, description: 'A concise short-form script' },
 ];
-
 export default function StudioPage() {
   const [selectedType, setSelectedType] = useState('post');
-  const [prompt, setPrompt] = useState(() => {
-    if (typeof window === 'undefined') return '';
-    const arbitrageHook = sessionStorage.getItem('arbitrage_hook');
-    const arbitrageAngle = sessionStorage.getItem('arbitrage_angle');
-    sessionStorage.removeItem('arbitrage_hook');
-    sessionStorage.removeItem('arbitrage_angle');
-    return arbitrageHook || arbitrageAngle
-      ? `Use this hook: "${arbitrageHook || ''}". ${arbitrageAngle ? `Strategy: ${arbitrageAngle}.` : ''}`
-      : '';
-  });
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState('');
-  const [error, setError] = useState('');
-
-  const handleFirstToken = useCallback(() => {
-    // Keep the mascot/orb animation alive until the request completes.
-  }, []);
-
-  const handleGenerate = async () => {
-    if (!prompt.trim()) return;
-    
-    setLoading(true);
-    setError('');
-    setResult('');
-
-    try {
-      const response = await fetch('/api/v1/studio/prompt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          type: selectedType,
-          user_input: prompt,
-        }),
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setResult(data.data.content);
-      } else {
-        setError(data.error || 'Generation failed');
-      }
-    } catch {
-      setError('Network error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div style={{ minHeight: '100vh', background: '#F6F6F6', fontFamily: 'Inter, sans-serif' }}>
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '40px 24px' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: '#191919', marginBottom: 8 }}>Content Studio</h1>
-        <p style={{ color: '#858585', marginBottom: 32 }}>Generate marketing content with AI • No AI-slop, only founder energy</p>
-
-        {/* Content Type Selection */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 32 }}>
-          {contentTypes.map((type) => (
-            <button
-              key={type.id}
-              onClick={() => setSelectedType(type.id)}
-              style={{
-                padding: 16,
-                borderRadius: 10,
-                border: `2px solid ${selectedType === type.id ? '#191919' : '#E8E8E8'}`,
-                background: selectedType === type.id ? '#EEEEEE' : '#FFFFFF',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: '150ms ease',
-              }}
-            >
-              <div style={{ fontSize: 24, marginBottom: 8 }}>{type.icon}</div>
-              <div style={{ fontWeight: 600, color: '#191919', fontSize: 14 }}>{type.label}</div>
-              <div style={{ fontSize: 11, color: '#858585', marginTop: 4 }}>{type.description}</div>
-            </button>
-          ))}
-        </div>
-
-        {/* Prompt Input */}
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#525252', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            What do you want to create?
-          </label>
-          <textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Describe what you want to create... e.g., 'Write a post about how AI is changing startup marketing'"
-            style={{
-              width: '100%',
-              height: 120,
-              padding: 14,
-              border: '1px solid #E8E8E8',
-              borderRadius: 10,
-              fontSize: 14,
-              resize: 'none',
-              outline: 'none',
-              fontFamily: 'inherit',
-            }}
-          />
-        </div>
-
-        {/* Generate Button */}
-        <button
-          onClick={handleGenerate}
-          disabled={loading || !prompt.trim()}
-          style={{
-            width: '100%',
-            padding: 14,
-            background: '#191919',
-            color: '#FFFFFF',
-            border: 'none',
-            borderRadius: 10,
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: loading || !prompt.trim() ? 'not-allowed' : 'pointer',
-            opacity: loading || !prompt.trim() ? 0.5 : 1,
-          }}
-        >
-          {loading ? 'Generating with founder energy...' : 'Generate Content'}
-        </button>
-
-        {/* // Thinking Animation */}
-        {loading && (
-          <div style={{ marginTop: 24, display: 'flex', justifyContent: 'center' }}>
-            <ThinkingAnimation
-              isActive={loading}
-              onFirstToken={handleFirstToken}
-              width={250}
-              height={100}
-            />
-          </div>
-        )}
-
-        {/* Anti-AI-Slop Badge */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 16, justifyContent: 'center' }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E' }} />
-          <span style={{ fontSize: 11, color: '#858585' }}>Anti-AI-slop mode: Raw narratives, unique hooks, no templates</span>
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div style={{ marginTop: 24, padding: 16, background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 10, color: '#DC2626' }}>
-            {error}
-          </div>
-        )}
-
-        {/* Result */}
-        {result && (
-          <div style={{ marginTop: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <h3 style={{ fontWeight: 600, color: '#191919' }}>Generated Content</h3>
-              <button
-                onClick={() => navigator.clipboard.writeText(result)}
-                style={{ fontSize: 12, color: '#525252', background: 'none', border: 'none', cursor: 'pointer' }}
-              >
-                Copy
-              </button>
-            </div>
-            <div style={{ padding: 20, background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: 10, whiteSpace: 'pre-wrap', fontSize: 14, lineHeight: 1.6 }}>
-              {result}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  const [prompt, setPrompt] = useState(() => { if (typeof window === 'undefined') return ''; const hook = sessionStorage.getItem('arbitrage_hook'); const angle = sessionStorage.getItem('arbitrage_angle'); sessionStorage.removeItem('arbitrage_hook'); sessionStorage.removeItem('arbitrage_angle'); return hook || angle ? `Use this hook: "${hook || ''}". ${angle ? `Strategy: ${angle}.` : ''}` : ''; });
+  const [loading, setLoading] = useState(false); const [result, setResult] = useState(''); const [error, setError] = useState(''); const [copied, setCopied] = useState(false);
+  const handleFirstToken = useCallback(() => undefined, []);
+  const handleGenerate = async () => { if (!prompt.trim()) return; setLoading(true); setError(''); setResult(''); setCopied(false); try { const response = await fetch('/api/v1/studio/prompt', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ type: selectedType, user_input: prompt }) }); const data = await response.json(); if (data.success) setResult(data.data.content); else setError(data.error || 'Generation failed'); } catch { setError('Network error. Please try again.'); } finally { setLoading(false); } };
+  const copyResult = async () => { await navigator.clipboard.writeText(result); setCopied(true); window.setTimeout(() => setCopied(false), 1800); };
+  return <div className="dm-route-page dm-studio-page"><div className="dm-page-title-row"><div><span className="dm-eyebrow">DeepMark Studio</span><h1>Make the next move legible.</h1><p>Give DeepMark a signal, a tension, or a rough idea. It will shape the first useful draft.</p></div><div className="dm-live-pill"><span /> Memory-aware generation</div></div><div className="dm-studio-grid"><section className="dm-route-card dm-studio-compose"><div className="dm-section-title"><span className="dm-route-empty-icon small"><Sparkles size={19} /></span><div><h2>What are we making?</h2><p>Choose a format, then describe the idea in your own words.</p></div></div><div className="dm-type-grid">{contentTypes.map((type) => { const Icon = type.icon; const active = selectedType === type.id; return <button key={type.id} className={`dm-type-card${active ? ' is-active' : ''}`} onClick={() => setSelectedType(type.id)}><Icon size={19} /><strong>{type.label}</strong><span>{type.description}</span>{active && <Check className="dm-type-check" size={15} />}</button>; })}</div><label className="dm-field-label" htmlFor="prompt">The raw signal</label><textarea id="prompt" className="dm-prompt-field" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="What happened, what changed, or what do you want your audience to understand?" /><div className="dm-compose-footer"><span>Write naturally. DeepMark will find the shape.</span><button className="dm-primary-button" onClick={handleGenerate} disabled={loading || !prompt.trim()}>{loading ? 'Thinking…' : 'Generate draft'} <ArrowRight size={15} /></button></div></section><aside className="dm-route-card dm-studio-side"><span className="dm-eyebrow">Signal quality</span><h2>Good inputs stay human.</h2><p>DeepMark works best when you bring the context only you have: the sharp opinion, the customer tension, or the change you are seeing.</p><div className="dm-signal-list"><div><span className="dm-signal-dot" /> A specific observation</div><div><span className="dm-signal-dot" /> A clear audience</div><div><span className="dm-signal-dot" /> One useful tension</div></div><div className="dm-side-rule" /><p className="dm-side-small">AI provider status is reported by the generation request. No content is shown as complete until the request returns.</p></aside></div>{loading && <div className="dm-thinking-panel"><ThinkingAnimation isActive={loading} onFirstToken={handleFirstToken} width={280} height={150} /></div>}{error && <div className="dm-error-banner">{error}</div>}{result && <section className="dm-route-card dm-result-card"><div className="dm-result-heading"><div><span className="dm-eyebrow">Draft ready</span><h2>Generated {contentTypes.find((type) => type.id === selectedType)?.label}</h2></div><button className="dm-copy-button" onClick={copyResult}>{copied ? <Check size={15} /> : <Copy size={15} />}{copied ? 'Copied' : 'Copy'}</button></div><div className="dm-result-body">{result}</div></section>}</div>;
 }

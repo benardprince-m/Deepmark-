@@ -1,47 +1,7 @@
 'use client';
-
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
+import { ArrowRight, BrainCircuit, Check, Sparkles } from 'lucide-react';
 import DeepMarkIntro from '@/components/motion/DeepMarkIntro';
 import DeepMarkMascot from '@/components/motion/DeepMarkMascot';
-
-export default function HomePage() {
-  const [showIntro, setShowIntro] = useState(true);
-  const finishIntro = useCallback(() => setShowIntro(false), []);
-
-  return (
-    <main className="min-h-screen overflow-hidden bg-[#0A0A0A] text-white">
-      {showIntro && <DeepMarkIntro onComplete={finishIntro} />}
-      <section className="relative mx-auto flex min-h-screen max-w-6xl items-center px-6 py-24 md:px-10">
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[620px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#22C55E]/[0.06] blur-3xl" />
-        <div className="relative grid w-full items-center gap-14 lg:grid-cols-[1.1fr_.9fr]">
-          <div>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#262626] bg-[#121212] px-3 py-1.5 text-xs text-[#858585]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
-              Marketing intelligence for founders
-            </div>
-            <h1 className="max-w-3xl text-5xl font-semibold leading-[1.04] tracking-[-0.05em] md:text-7xl">
-              Your startup&apos;s memory for the <span className="text-[#22C55E]">next move.</span>
-            </h1>
-            <p className="mt-7 max-w-xl text-base leading-7 text-[#858585] md:text-lg">
-              DeepMark learns your company, sharpens your message, and turns signal into founder-grade marketing content.
-            </p>
-            <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/auth/signup" className="rounded-full bg-[#22C55E] px-5 py-3 text-sm font-semibold text-[#0A0A0A] transition-transform hover:-translate-y-0.5">Start building</Link>
-              <Link href="/dashboard/studio" className="rounded-full border border-[#262626] px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-[#525252]">Try the Studio</Link>
-            </div>
-          </div>
-          <div className="flex min-h-[420px] items-center justify-center rounded-[32px] border border-[#262626] bg-[#0D0D0D] p-10 shadow-2xl shadow-black/30">
-            <div className="flex flex-col items-center gap-6 text-center">
-              <DeepMarkMascot state="idle" size={260} interactive showOrb />
-              <div>
-                <p className="text-sm font-medium text-white">A calmer way to think about growth.</p>
-                <p className="mt-2 text-xs text-[#858585]">Move your cursor around DeepMark.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-  );
-}
+export default function HomePage() { const [showIntro, setShowIntro] = useState(true); const finishIntro = useCallback(() => setShowIntro(false), []); return <main className="dm-public-page">{showIntro && <DeepMarkIntro onComplete={finishIntro} />}<nav className="dm-public-nav"><Link href="/" className="dm-public-brand"><span className="dm-brand-mark"><i /><i /></span>DeepMark</Link><div className="dm-public-links"><Link href="/pricing">Pricing</Link><Link href="/auth/login">Sign in</Link><Link href="/auth/signup" className="dm-public-cta">Start building <ArrowRight size={14} /></Link></div></nav><section className="dm-hero"><div className="dm-hero-copy"><span className="dm-hero-kicker"><span /> Marketing intelligence for founders</span><h1>Your startup&apos;s memory for the <em>next move.</em></h1><p>DeepMark learns your company, sharpens your message, and turns signal into founder-grade marketing content.</p><div className="dm-hero-actions"><Link href="/auth/signup" className="dm-primary-button">Start building <ArrowRight size={15} /></Link><Link href="/dashboard/studio" className="dm-secondary-button">Try the Studio</Link></div><div className="dm-hero-proof"><span><Check size={14} /> Startup context</span><span><Check size={14} /> Real AI generation</span><span><Check size={14} /> No fake metrics</span></div></div><div className="dm-hero-visual"><div className="dm-visual-glow" /><div className="dm-mascot-card"><DeepMarkMascot state="idle" size={255} interactive showOrb /><div><strong>A calmer way to think about growth.</strong><span>Move your cursor around DeepMark.</span></div></div></div></section><section className="dm-public-feature-strip"><div><BrainCircuit size={20} /><strong>Memory-aware</strong><span>Work from what is true about your startup.</span></div><div><Sparkles size={20} /><strong>Founder-grade</strong><span>Find the useful angle before making noise.</span></div><div><Check size={20} /><strong>Evidence-first</strong><span>Keep verified signals separate from guesses.</span></div></section></main>; }
