@@ -1,0 +1,17 @@
+flowchart LR
+  User[Founder] --> Web[Next.js App Router]
+  Web --> Landing[Landing + Motion System]
+  Web --> Workspace[Dashboard Workspace]
+  Web --> Studio[Content Studio]
+  Web --> Chat[Chat Welcome Surface]
+  Web --> API[API Routes /api/v1]
+  API --> Auth[JWT + httpOnly Cookies]
+  API --> AI[AI Provider Router]
+  API --> Data[Supabase PostgreSQL]
+  API --> Billing[Stripe Billing]
+  API --> Obs[Observability + Usage]
+  Data --> Memory[Startup Memory]
+  Data --> Content[Campaigns, Tasks, Content]
+  AI --> Output[Drafts + Recommendations]
+  Memory --> AI
+  Output --> Content

@@ -27,3 +27,8 @@ Format:
 - Action: Built DeepMark Motion System v1: original SVG mascot with cursor gaze, welcome/idle/listening/searching/reasoning/solving/complete/error states, mascot-to-orb transitions, seven-second landing intro with skip and reduced-motion behavior, replacement of Pong ThinkingAnimation, Studio integration, and a first Chat welcome surface with dashboard navigation.
 - Roadmap alignment: Inside roadmap — Phase 0 frontend stabilization and Phase 1 core experience; Supabase remains intentionally deferred while the interaction model is validated.
 - Evidence: Observed — targeted ESLint passed for all changed motion/landing/Studio/chat files; production build compiled TypeScript and generated all 40 routes successfully with temporary build-only secrets.
+
+## 2026-10-04 — Manus
+- Action: Rewrote `Deepmark-/README.md` as the canonical human-and-agent onboarding document; added product context, current-state truth table, architecture/request-path documentation, repository map, environment/setup instructions, API surface, motion-system state model, roadmap, deployment guidance, and agent workflow guidance. Added editable Mermaid diagrams and rendered PNGs under `Deepmark-/docs/diagrams/`.
+- Roadmap alignment: Inside roadmap — Phase 0 documentation/stabilization and Phase 1 contributor orientation.
+- Evidence: Observed — README reviewed locally; `git diff --check` passed; both Mermaid sources rendered successfully to PNG; README contains four Mermaid diagrams and embedded architecture/agent-flow images.

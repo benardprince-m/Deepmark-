@@ -1,0 +1,16 @@
+flowchart TD
+  Start[New agent or contributor] --> Read[Read README.md]
+  Read --> Rules[Read AGENTS.md + AGENT_LOG.md]
+  Rules --> Truth[Check current source, migrations, and git status]
+  Truth --> Scope[Choose one scoped change]
+  Scope --> Build[Implement with existing patterns]
+  Build --> Validate[Lint, typecheck, and build]
+  Validate --> Log[Append one session entry to AGENT_LOG.md]
+  Log --> Commit[Commit with a focused message]
+  Commit --> Push[Push to main only when requested]
+
+  Founder[Founder context] --> Memory[Startup memory]
+  Memory --> Plan[Plan and prioritize]
+  Plan --> Create[Create content or campaign]
+  Create --> Measure[Measure analytics]
+  Measure --> Memory
