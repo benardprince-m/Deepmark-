@@ -1,179 +1,210 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { isAuthenticated, logout, getUser } from '@/lib/auth';
+import { useEffect, useMemo } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { getUser, isAuthenticated, logout } from '@/lib/auth';
+import {
+  ArrowRight,
+  BarChart3,
+  Bell,
+  Box,
+  CalendarDays,
+  ChevronDown,
+  CircleHelp,
+  FileText,
+  Folder,
+  GitBranch,
+  LayoutDashboard,
+  ListChecks,
+  LogOut,
+  Megaphone,
+  Mic2,
+  MoreHorizontal,
+  Search,
+  Settings,
+  Users,
+} from 'lucide-react';
 
-const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', section: 'workspace' },
-  { href: '/dashboard/studio', label: 'Studio', icon: 'M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z', section: 'workspace' },
-  { href: '/dashboard/chat', label: 'Chat', icon: 'M8 10h8m-8 4h5m7-2a8 8 0 11-4.9-7.35L19 4l-.65 3.9A8 8 0 0120 12z', section: 'workspace' },
-  { href: '/dashboard/planner', label: 'Planner', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', section: 'workspace' },
-  { href: '/dashboard/plan', label: 'Marketing Plan', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01', section: 'workspace' },
-  { href: '/dashboard/analytics', label: 'Analytics', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', section: 'insights' },
-  { href: '/dashboard/settings', label: 'Settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', section: 'settings' },
+const navGroups = [
+  {
+    label: 'Workspace',
+    items: [
+      { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/dashboard/campaigns', label: 'Campaigns', icon: Megaphone, disabled: true },
+      { href: '/dashboard/content', label: 'Content', icon: Folder, disabled: true },
+      { href: '/dashboard/studio', label: 'Studio', icon: Mic2 },
+      { href: '/dashboard/tasks', label: 'Tasks', icon: ListChecks, disabled: true },
+    ],
+  },
+  {
+    label: 'Insights',
+    items: [
+      { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
+      { href: '/dashboard/integrations', label: 'Integrations', icon: GitBranch, disabled: true },
+      { href: '/dashboard/memory', label: 'Memory', icon: Box, disabled: true },
+    ],
+  },
 ];
+
+const metricCards = [
+  { label: 'Content Created', value: '—', note: 'Connect your workspace data' },
+  { label: 'Scheduled', value: '—', note: 'Planner data not connected' },
+  { label: 'Published', value: '—', note: 'Publishing data not connected' },
+  { label: 'Engagement', value: '—', note: 'No verified analytics yet' },
+];
+
+function BrandMark() {
+  return (
+    <div className="dm-brand-mark" aria-hidden="true">
+      <span />
+      <span />
+    </div>
+  );
+}
+
+function NavIcon({ icon: Icon }: { icon: typeof LayoutDashboard }) {
+  return <Icon size={18} strokeWidth={1.8} />;
+}
+
+function EmptyChart() {
+  return (
+    <div className="dm-chart" aria-label="Content performance chart awaiting verified data">
+      <div className="dm-chart-y-axis" aria-hidden="true">
+        <span>—</span><span>—</span><span>—</span><span>—</span><span>—</span>
+      </div>
+      <div className="dm-chart-grid" aria-hidden="true">
+        <span /><span /><span /><span /><span />
+        <div className="dm-chart-empty">
+          <BarChart3 size={22} strokeWidth={1.5} />
+          <span>Verified performance data will appear here</span>
+        </div>
+        <div className="dm-chart-x-axis"><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span></div>
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const user = useMemo(() => getUser(), []);
   const isAuth = useMemo(() => isAuthenticated(), []);
-  const [activeNav, setActiveNav] = useState('/dashboard');
+  const displayName = user?.email?.split('@')[0] || 'Founder';
+  const initials = displayName.slice(0, 2).toUpperCase();
 
   useEffect(() => {
-    if (!isAuth) {
-      router.push('/auth/login');
-    }
+    if (!isAuth) router.push('/auth/login');
   }, [isAuth, router]);
 
-  const handleLogout = () => {
-    logout();
-    router.push('/auth/login');
-  };
-
-  const handleNav = (href: string) => {
-    setActiveNav(href);
-    router.push(href);
-  };
-
   if (!isAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{background: '#F6F6F6'}}>
-        <div style={{color: '#858585'}}>Loading...</div>
-      </div>
-    );
+    return <div className="dm-dashboard-loading">Loading workspace…</div>;
   }
 
-  const sections = [
-    { id: 'workspace', label: 'Workspace' },
-    { id: 'insights', label: 'Insights' },
-    { id: 'settings', label: 'Settings' },
-  ];
+  const navigate = (href: string, disabled?: boolean) => {
+    if (!disabled) router.push(href);
+  };
 
   return (
-    <div className="min-h-screen flex" style={{background: '#F6F6F6', fontFamily: 'Inter, -apple-system, sans-serif'}}>
-      {/* Sidebar */}
-      <aside style={{
-        width: 240,
-        background: '#FFFFFF',
-        borderRight: '1px solid #E8E8E8',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'sticky',
-        top: 0,
-        height: '100vh'
-      }}>
-        {/* Logo */}
-        <div style={{padding: '22px 20px', borderBottom: '1px solid #E8E8E8', display: 'flex', alignItems: 'center', gap: 10}}>
-          <div style={{width: 32, height: 32, borderRadius: 8, background: '#191919', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-            <span style={{fontSize: 14, fontWeight: 800, color: 'white'}}>D</span>
-          </div>
-          <span style={{fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: '#191919'}}>DeepMark</span>
+    <div className="dm-dashboard-shell">
+      <aside className="dm-dashboard-sidebar">
+        <div className="dm-sidebar-brand">
+          <BrandMark />
+          <span>DeepMark</span>
         </div>
 
-        {/* Navigation */}
-        <nav style={{flex: 1, padding: '10px 0', overflowY: 'auto'}}>
-          {sections.map((section) => (
-            <div key={section.id}>
-              <div style={{padding: '12px 20px 6px', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#858585'}}>
-                {section.label}
-              </div>
-              {navItems.filter(item => item.section === section.id).map((item) => (
-                <button
-                  key={item.href}
-                  onClick={() => handleNav(item.href)}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    padding: '10px 20px',
-                    background: activeNav === item.href ? '#EEEEEE' : 'transparent',
-                    border: 'none',
-                    borderLeft: activeNav === item.href ? '2px solid #191919' : '2px solid transparent',
-                    color: activeNav === item.href ? '#191919' : '#858585',
-                    fontSize: 14,
-                    fontWeight: activeNav === item.href ? 600 : 500,
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    transition: '150ms cubic-bezier(0, 0, 0.2, 1)'
-                  }}
-                >
-                  <svg style={{width: 18, height: 18, flexShrink: 0}} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
-                  </svg>
-                  {item.label}
-                </button>
-              ))}
+        <nav className="dm-dashboard-nav" aria-label="Workspace navigation">
+          {navGroups.map((group) => (
+            <div className="dm-nav-group" key={group.label}>
+              <div className="dm-nav-label">{group.label}</div>
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const active = pathname === item.href;
+                return (
+                  <button
+                    className={`dm-nav-item${active ? ' is-active' : ''}${item.disabled ? ' is-disabled' : ''}`}
+                    key={item.href}
+                    onClick={() => navigate(item.href, item.disabled)}
+                    title={item.disabled ? 'Coming soon' : undefined}
+                  >
+                    <NavIcon icon={Icon} />
+                    <span>{item.label}</span>
+                    {item.disabled && <span className="dm-nav-soon">Soon</span>}
+                  </button>
+                );
+              })}
             </div>
           ))}
         </nav>
 
-        {/* User */}
-        <div style={{padding: '16px 12px', borderTop: '1px solid #E8E8E8'}}>
-          <div 
-            onClick={handleLogout}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: 8,
-              borderRadius: 6,
-              cursor: 'pointer'
-            }}
-          >
-            <div style={{width: 32, height: 32, borderRadius: '50%', background: '#191919', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-              <span style={{fontSize: 13, fontWeight: 700, color: 'white'}}>{user?.email?.[0]?.toUpperCase() || 'U'}</span>
-            </div>
-            <div>
-              <div style={{fontSize: 13, fontWeight: 600, color: '#191919'}}>{user?.email?.split('@')[0] || 'User'}</div>
-              <div style={{fontSize: 11, color: '#858585'}}>Free plan</div>
-            </div>
-          </div>
+        <div className="dm-sidebar-bottom">
+          <button className="dm-nav-item" onClick={() => router.push('/dashboard/settings')}>
+            <Settings size={18} strokeWidth={1.8} />
+            <span>Settings</span>
+          </button>
+          <button className="dm-nav-item">
+            <CircleHelp size={18} strokeWidth={1.8} />
+            <span>Help Center</span>
+          </button>
+          <button className="dm-nav-item dm-logout" onClick={() => { logout(); router.push('/auth/login'); }}>
+            <LogOut size={18} strokeWidth={1.8} />
+            <span>Log out</span>
+          </button>
         </div>
       </aside>
 
-      {/* Main */}
-      <main className="flex-1 flex flex-col min-h-screen">
-        {/* Topbar */}
-        <header style={{height: 58, borderBottom: '1px solid #E8E8E8', display: 'flex', alignItems: 'center', padding: '0 28px', gap: 16, background: '#FFFFFF', position: 'sticky', top: 0, zIndex: 100}}>
-          <div style={{flex: 1, fontSize: 15, fontWeight: 600}}>Dashboard</div>
-          <div style={{display: 'flex', gap: 8, alignItems: 'center'}}>
-            <button onClick={() => handleNav('/dashboard/studio')} style={{padding: '9px 18px', borderRadius: 6, fontSize: 13, fontWeight: 600, border: 'none', background: '#191919', color: 'white', cursor: 'pointer'}}>
-              + New Content
+      <main className="dm-dashboard-main">
+        <header className="dm-dashboard-header">
+          <h1>Dashboard</h1>
+          <div className="dm-header-actions">
+            <button className="dm-search" type="button" aria-label="Search">
+              <Search size={18} strokeWidth={1.8} />
+              <span>Search anything…</span>
+              <kbd>⌘ K</kbd>
+            </button>
+            <button className="dm-icon-button" aria-label="Notifications"><Bell size={19} strokeWidth={1.8} /></button>
+            <button className="dm-profile" type="button">
+              <span className="dm-avatar">{initials}</span>
+              <span className="dm-profile-copy"><strong>{displayName}</strong><small>DeepMark Inc.</small></span>
+              <ChevronDown size={16} />
             </button>
           </div>
         </header>
 
-        {/* Content */}
-        <div style={{flex: 1, padding: 28, maxWidth: 1180}}>
-          {/* Stats */}
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28}}>
-            {[
-              { label: 'Content Created', value: '—', change: 'Analytics connection pending' },
-              { label: 'Scheduled', value: '—', change: 'Planner connection pending' },
-              { label: 'Published', value: '—', change: 'Publishing connection pending' },
-              { label: 'Engagement', value: '—', change: 'No verified data yet' },
-            ].map((stat, i) => (
-              <div key={i} style={{background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: 10, padding: 16}}>
-                <div style={{fontSize: 12, fontWeight: 600, color: '#858585', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6}}>{stat.label}</div>
-                <div style={{fontSize: 28, fontWeight: 700, color: '#191919'}}>{stat.value}</div>
-                <div style={{fontSize: 12, color: '#858585', marginTop: 4}}>{stat.change}</div>
-              </div>
-            ))}
+        <div className="dm-dashboard-content">
+          <div className="dm-toolbar">
+            <div className="dm-view-switcher" role="tablist" aria-label="Time range">
+              <button>Day</button><button>Week</button><button className="is-selected">Month</button><button>Year</button>
+            </div>
+            <button className="dm-date-button"><CalendarDays size={16} /><span>1 Sep 2026 – 30 Sep 2026</span><ChevronDown size={15} /></button>
           </div>
 
-          {/* Welcome Card */}
-          <div style={{background: '#FFFFFF', border: '1px solid #E8E8E8', borderRadius: 14, padding: 32}}>
-            <h2 style={{fontSize: 18, fontWeight: 700, marginBottom: 8}}>Welcome back, {user?.email?.split('@')[0] || 'Founder'}.</h2>
-            <p style={{color: '#858585', marginBottom: 20}}>Your workspace is ready. Create your first piece of content in Studio; performance metrics will appear once verified data is connected.</p>
-            <button 
-              onClick={() => handleNav('/dashboard/studio')}
-              style={{padding: '10px 20px', borderRadius: 8, fontSize: 14, fontWeight: 600, border: 'none', background: '#191919', color: 'white', cursor: 'pointer'}}
-            >
-              Go to Studio →
-            </button>
-          </div>
+          <section className="dm-metric-grid" aria-label="Workspace metrics">
+            {metricCards.map((metric) => (
+              <article className="dm-metric-card" key={metric.label}>
+                <div className="dm-card-heading"><span>{metric.label}</span><span className="dm-metric-icon"><FileText size={17} strokeWidth={1.7} /></span></div>
+                <strong>{metric.value}</strong>
+                <p>{metric.note}</p>
+              </article>
+            ))}
+          </section>
+
+          <section className="dm-dashboard-grid">
+            <article className="dm-panel dm-revenue-panel">
+              <div className="dm-panel-heading"><div><h2>Content Overview</h2><p>Creation and publishing activity</p></div><button className="dm-select-button">All content <ChevronDown size={14} /></button></div>
+              <EmptyChart />
+            </article>
+            <article className="dm-panel dm-growth-panel">
+              <div className="dm-panel-heading"><div><h2>Workspace Growth</h2><p>Verified audience signals</p></div><button className="dm-more-button" aria-label="More options"><MoreHorizontal size={19} /></button></div>
+              <div className="dm-growth-empty"><div className="dm-growth-ring"><div><strong>—</strong><span>not connected</span></div></div><div className="dm-growth-note"><Users size={18} /><span>Connect an integration to see growth here.</span></div></div>
+            </article>
+          </section>
+
+          <section className="dm-panel dm-upcoming-panel">
+            <div className="dm-panel-heading dm-upcoming-heading"><div><h2>Upcoming Content</h2><p>Planned work from your content calendar</p></div><button className="dm-link-button" onClick={() => router.push('/dashboard/planner')}>View planner <ArrowRight size={16} /></button></div>
+            <div className="dm-empty-table"><div className="dm-empty-table-icon"><CalendarDays size={22} strokeWidth={1.6} /></div><strong>No upcoming content yet</strong><span>Create your first draft in Studio, then schedule it from Planner.</span><button className="dm-primary-button" onClick={() => router.push('/dashboard/studio')}>Create content <ArrowRight size={15} /></button></div>
+          </section>
+
+          <div className="dm-dashboard-footer"><span>Showing verified workspace data only</span><span className="dm-footer-status"><span /> All systems operational</span></div>
         </div>
       </main>
     </div>
