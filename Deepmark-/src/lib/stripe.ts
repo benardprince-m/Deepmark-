@@ -1,8 +1,26 @@
 import Stripe from 'stripe';
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-07-29.dahlia',
-  typescript: true,
+let stripeClient: Stripe | null = null;
+
+function getStripeClient(): Stripe {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('Stripe is not configured. Set STRIPE_SECRET_KEY before using billing routes.');
+  }
+
+  stripeClient ??= new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2026-07-29.dahlia',
+    typescript: true,
+  });
+
+  return stripeClient;
+}
+
+export const stripe = new Proxy({} as Stripe, {
+  get(_target, property, receiver) {
+    const client = getStripeClient();
+    const value = Reflect.get(client, property, receiver);
+    return typeof value === 'function' ? value.bind(client) : value;
+  },
 });
 
 export type PlanType = 'free' | 'starter' | 'pro' | 'enterprise';
