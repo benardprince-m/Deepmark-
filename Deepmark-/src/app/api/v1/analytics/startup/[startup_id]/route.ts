@@ -53,6 +53,29 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       }, 'Analytics retrieved successfully');
     }
 
+    // analytics.content_id references content, so resolve content rows from
+    // the startup's campaigns before querying analytics.
+    const { data: contentRows, error: contentError } = await getSupabaseAdmin()
+      .from('content')
+      .select('id')
+      .in('campaign_id', campaignIds)
+      .is('deleted_at', null);
+
+    if (contentError) {
+      return serverErrorResponse('Failed to retrieve startup content');
+    }
+
+    const contentIds = contentRows?.map(content => content.id) || [];
+    if (contentIds.length === 0) {
+      return successResponse({
+        analytics: [],
+        totals: { impressions: 0, engagement: 0, clicks: 0 },
+        grouped: {},
+        period,
+        groupBy,
+      }, 'Analytics retrieved successfully');
+    }
+
     // Build date filter
     let dateFilter = '';
     if (period === 'week') {
@@ -65,7 +88,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     let query = getSupabaseAdmin()
       .from('analytics')
       .select('*')
-      .in('content_id', campaignIds);
+      .in('content_id', contentIds);
 
     if (dateFilter) {
       query = query.gte('recorded_at', dateFilter);

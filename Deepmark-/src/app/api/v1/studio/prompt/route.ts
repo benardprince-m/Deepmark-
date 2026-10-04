@@ -8,12 +8,12 @@ import { requestCapability, AICapability } from '@/lib/ai/registry';
 const typeToCapability: Record<string, AICapability> = {
   post: 'generateLinkedInPost',
   carousel: 'generateCarousel',
-  image: 'generateLinkedInPost',
+  thread: 'generateXThread',
   video: 'generateVideoScript',
 };
 
 const promptSchema = z.object({
-  type: z.enum(['post', 'carousel', 'image', 'video']),
+  type: z.enum(['post', 'carousel', 'thread', 'video']),
   context: z.record(z.string()).optional(),
   user_input: z.string().min(1),
   // Optional context fields for better prompts

@@ -5,10 +5,10 @@ import { useState, useEffect, useCallback } from 'react';
 import ThinkingAnimation from '@/components/thinking/ThinkingAnimation';
 
 const contentTypes = [
-  { id: 'post', label: 'LinkedIn Post', icon: '📝', description: 'Engaging LinkedIn content' },
-  { id: 'carousel', label: 'Carousel', icon: '🎠', description: 'Multi-slide content' },
-  { id: 'thread', label: 'X Thread', icon: '🐦', description: 'Twitter thread format' },
-  { id: 'video', label: 'Video Script', icon: '🎬', description: 'Short video content' },
+  { id: 'post', label: 'LinkedIn Post', icon: '//', description: 'Engaging LinkedIn content' },
+  { id: 'carousel', label: 'Carousel', icon: '[]', description: 'Multi-slide content' },
+  { id: 'thread', label: 'X Thread', icon: '>>', description: 'Thread format for X' },
+  { id: 'video', label: 'Video Script', icon: '()', description: 'Short video content' },
 ];
 
 export default function StudioPage() {
